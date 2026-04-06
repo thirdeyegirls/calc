@@ -17,7 +17,6 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         html, body { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Segoe UI', sans-serif; background-color: var(--win-bg); color: var(--win-text); overflow: hidden; }
 
-        /* 上部固定エリア */
         .header-panel {
             position: absolute; top: 0; left: 0; width: 100%; height: 180px;
             background-color: var(--win-panel-bg); z-index: 1000;
@@ -34,37 +33,62 @@
         #tax-btn.active { background-color: var(--win-btn-active); color: #fff; border-color: var(--win-btn-active); }
         .reset-btn { background-color: #a12c2c; color: #fff; border-color: #a12c2c; }
 
-        /* スクロールエリア */
-        .main-content { position: absolute; top: 180px; bottom: 0; left: 0; width: 100%; overflow-y: auto; padding: 10px 10px 120px; }
+        .main-content { position: absolute; top: 180px; bottom: 0; left: 0; width: 100%; overflow-y: auto; padding: 10px 10px 150px; }
         h2 { font-size: 15px; font-weight: 600; margin: 25px 0 10px 5px; color: #333; border-left: 3px solid #a12c2c; padding-left: 8px; }
         .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
         .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
 
         .btn-select {
             background-color: var(--win-btn-bg); border: 1px solid var(--win-border);
-            border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer;
-            min-height: 55px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border-radius: 4px; font-size: 12px; font-weight: 500; cursor: pointer;
+            min-height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         .btn-select.active { background-color: var(--win-btn-active); color: #fff; border: none; }
         .btn-select span { font-size: 10px; margin-top: 2px; opacity: 0.8; }
 
-        /* カウンター・調整エリア */
+        .sub-group { background: #ebebeb; padding: 8px; border-radius: 4px; margin-bottom: 4px; }
+        .sub-label { font-size: 11px; font-weight: bold; color: #666; margin-bottom: 5px; display: block; }
+        
+        /* 特定デザインの注釈とiボタン */
+        .design-note { font-size: 12px; color: #444; margin-top: 8px; background: #fff; padding: 10px; border-radius: 4px; border-left: 3px solid #ccc; }
+        .info-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; list-style: none; padding: 0; }
+        .info-item { background: #f0f0f0; padding: 4px 8px; border-radius: 4px; display: flex; align-items: center; gap: 4px; font-size: 11px; }
+        .i-icon { width: 18px; height: 18px; background: #a12c2c; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; cursor: pointer; }
+
+        /* 画像モーダル */
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
+        .modal-content { position: relative; max-width: 90%; max-height: 80%; }
+        .modal-img { width: 100%; border-radius: 4px; }
+        .modal-close { position: absolute; top: -40px; right: 0; color: #fff; font-size: 30px; cursor: pointer; }
+        .modal-nav { position: absolute; top: 50%; width: 100%; display: flex; justify-content: space-between; transform: translateY(-50%); pointer-events: none; }
+        .nav-btn { background: rgba(255,255,255,0.3); color: #fff; border: none; padding: 15px; cursor: pointer; pointer-events: auto; }
+
         .counter-row { background-color: #fff; border: 1px solid var(--win-border); padding: 10px; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
         .counter-controls { display: flex; align-items: center; gap: 8px; }
         .btn-count { width: 35px; height: 35px; border: 1px solid var(--win-border); background: #f9f9f9; border-radius: 4px; font-size: 18px; }
         .count-val { font-size: 18px; font-weight: 600; min-width: 25px; text-align: center; }
 
-        /* 最終調整UI */
-        .adj-box { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; }
+        .adj-box { display: flex; flex-direction: column; gap: 8px; }
         .adj-top-row { display: flex; gap: 5px; }
         .adj-bottom-row { display: flex; gap: 5px; align-items: center; }
-        .adj-type-btn { flex: 1; height: 45px; border: 1px solid var(--win-border); background: #fff; border-radius: 4px; font-weight: bold; font-size: 14px; }
-        .adj-type-btn.active { background: #555; color: #fff; }
-        .adj-input { flex: 1; height: 50px; border: 1px solid var(--win-border); border-radius: 4px; text-align: right; padding: 0 10px; font-size: 20px; font-weight: bold; font-family: monospace; background: #fff; }
-        .adj-zero-btn { width: 60px; height: 50px; border: 1px solid var(--win-border); background: #eee; border-radius: 4px; font-weight: bold; font-size: 16px; color: #a12c2c; }
+        .adj-type-btn { flex: 1; height: 45px; border: 1px solid var(--win-border); background: #fff; border-radius: 4px; font-weight: bold; }
+        .adj-input { flex: 1; height: 50px; border: 1px solid var(--win-border); border-radius: 4px; text-align: right; padding: 0 10px; font-size: 20px; font-weight: bold; background: #fff; }
+        .adj-zero-btn { width: 60px; height: 50px; border: 1px solid var(--win-border); background: #eee; border-radius: 4px; font-weight: bold; color: #a12c2c; }
     </style>
 </head>
 <body>
+
+<div id="imageModal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close" onclick="closeModal()">×</span>
+        <img id="modalImg" class="modal-img">
+        <div class="modal-nav" id="modalNav">
+            <button class="nav-btn" onclick="changeImg(-1)">◀</button>
+            <button class="nav-btn" onclick="changeImg(1)">▶</button>
+        </div>
+    </div>
+</div>
 
 <div class="header-panel">
     <div class="win-title">標準電卓 / 塗装シミュレーター</div>
@@ -95,32 +119,88 @@
     <div id="custom-options">
         <section>
             <h2>3. 特殊塗装</h2>
-            <div style="display: flex; flex-direction: column; gap: 4px;">
-                <div id="btn-pearl" class="btn-select" onclick="toggleColor('pearl')" style="min-height: 65px;">パールホワイト<span>+¥2,000</span></div>
+            <div class="grid-2">
+                <div id="btn-pearl" class="btn-select" onclick="toggleColor('pearl')">パールホワイト<span>+¥2,000</span></div>
+                <div id="btn-candy" class="btn-select" onclick="toggleColor('candy')">キャンディ<span>+¥2,000</span></div>
+                <div id="btn-flake" class="btn-select" onclick="toggleColor('flake')">フレーク<span>+¥4,000</span></div>
+                <div id="btn-wrap" class="btn-select" onclick="toggleColor('wrap')">ラップ<span>+¥4,000</span></div>
+            </div>
+        </section>
+
+        <section>
+            <h2>4. デザイン選択 (部位別)</h2>
+            <div class="sub-group">
+                <span class="sub-label">左右の構成</span>
                 <div class="grid-2">
-                    <div id="btn-candy" class="btn-select" onclick="toggleColor('candy')">キャンディ<span>+¥2,000</span></div>
-                    <div style="display: grid; gap: 4px;">
-                        <div id="btn-flake" class="btn-select" onclick="toggleColor('flake')">フレーク<span>+¥4,000</span></div>
-                        <div id="btn-wrap" class="btn-select" onclick="toggleColor('wrap')">ラップ<span>+¥4,000</span></div>
+                    <div id="side-sync-yes" class="btn-select active" onclick="setSideSync(true)">左右同じ</div>
+                    <div id="side-sync-no" class="btn-select" onclick="setSideSync(false)">左右別々</div>
+                </div>
+            </div>
+
+            <div id="side-same-area" class="sub-group">
+                <span class="sub-label">左右デザインの内容</span>
+                <div class="grid-3">
+                    <div id="side-same-none" class="btn-select active" onclick="setSideDesign('same', 'none')">なし</div>
+                    <div id="side-same-normal" class="btn-select" onclick="setSideDesign('same', 'normal')">普通<span>+¥2,000</span></div>
+                    <div id="side-same-special" class="btn-select" onclick="setSideDesign('same', 'special')">特定<span>+¥4,000</span></div>
+                </div>
+            </div>
+
+            <div id="side-diff-area" style="display:none;">
+                <div class="sub-group">
+                    <span class="sub-label">左(L) デザイン</span>
+                    <div class="grid-3">
+                        <div id="side-l-none" class="btn-select active" onclick="setSideDesign('l', 'none')">なし</div>
+                        <div id="side-l-normal" class="btn-select" onclick="setSideDesign('l', 'normal')">普通<span>+¥2,000</span></div>
+                        <div id="side-l-special" class="btn-select" onclick="setSideDesign('l', 'special')">特定<span>+¥4,000</span></div>
                     </div>
+                </div>
+                <div class="sub-group">
+                    <span class="sub-label">右(R) デザイン</span>
+                    <div class="grid-3">
+                        <div id="side-r-none" class="btn-select active" onclick="setSideDesign('r', 'none')">なし</div>
+                        <div id="side-r-normal" class="btn-select" onclick="setSideDesign('r', 'normal')">普通<span>+¥2,000</span></div>
+                        <div id="side-r-special" class="btn-select" onclick="setSideDesign('r', 'special')">特定<span>+¥4,000</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-group">
+                <span class="sub-label">バック デザイン</span>
+                <div class="grid-3">
+                    <div id="back-none" class="btn-select active" onclick="setBackDesign('none')">なし</div>
+                    <div id="back-normal" class="btn-select" onclick="setBackDesign('normal')">普通<span>+¥2,000</span></div>
+                    <div id="back-special" class="btn-select" onclick="setBackDesign('special')">特定<span>+¥4,000</span></div>
+                </div>
+            </div>
+
+            <div class="design-note">
+                <strong>特定デザイン詳細（iで写真表示）：</strong>
+                <div class="info-list">
+                    <div class="info-item">ウイング <div class="i-icon" onclick="openModal('wing')">i</div></div>
+                    <div class="info-item">リーフ3 <div class="i-icon" onclick="openModal('leaf')">i</div></div>
+                    <div class="info-item">スカルズ <div class="i-icon" onclick="openModal('skulls')">i</div></div>
+                    <div class="info-item">ウイングスカル <div class="i-icon" onclick="openModal('wingskull')">i</div></div>
+                    <div class="info-item">ローズ1 <div class="i-icon" onclick="openModal('rose')">i</div></div>
+                    <div class="info-item">エンブレムクロス <div class="i-icon" onclick="openModal('cross')">i</div></div>
                 </div>
             </div>
         </section>
 
         <section>
-            <h2>4. デザイン・文字入れ</h2>
-            <div id="design-counters"></div>
+            <h2>5. 文字入れ (個数)</h2>
+            <div id="text-counters"></div>
         </section>
 
         <section>
-            <h2>5. 最終調整</h2>
+            <h2>6. 最終調整</h2>
             <div class="adj-box">
                 <div class="adj-top-row">
                     <button id="adj-plus" class="adj-type-btn active" onclick="setAdjType(1)">＋ 加算</button>
                     <button id="adj-minus" class="adj-type-btn" onclick="setAdjType(-1)">－ 減算</button>
                 </div>
                 <div class="adj-bottom-row">
-                    <input type="number" id="adj-input" class="adj-input" placeholder="数値入力" oninput="updateAdjValue()" pattern="[0-9]*" inputmode="numeric">
+                    <input type="number" id="adj-input" class="adj-input" placeholder="数値入力" oninput="updateAdjValue()" inputmode="numeric">
                     <button class="adj-zero-btn" onclick="clearAdj()">0</button>
                 </div>
             </div>
@@ -129,55 +209,97 @@
 </div>
 
 <script>
+    const images = {
+        wing: ["https://img07.shop-pro.jp/PA01445/472/etc_base64/U0lERV8wMQ.jpg", "https://img07.shop-pro.jp/PA01445/472/etc_base64/U0lERV8wMg.jpg"],
+        leaf: ["https://img07.shop-pro.jp/PA01445/472/etc_base64/U0lERV8wNw.jpg"],
+        skulls: ["https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18wOQ.jpg"],
+        wingskull: ["https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18xMQ.jpg"],
+        rose: ["https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18xNg.jpg"],
+        cross: ["https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18xOQ.jpg", "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18yMA.jpg"]
+    };
+
+    let currentGallery = [];
+    let currentIndex = 0;
+
+    function openModal(key) {
+        currentGallery = images[key];
+        currentIndex = 0;
+        document.getElementById('imageModal').style.display = 'flex';
+        document.getElementById('modalNav').style.display = currentGallery.length > 1 ? 'flex' : 'none';
+        updateModalImg();
+    }
+    function closeModal() { document.getElementById('imageModal').style.display = 'none'; }
+    function changeImg(dir) {
+        currentIndex = (currentIndex + dir + currentGallery.length) % currentGallery.length;
+        updateModalImg();
+    }
+    function updateModalImg() { document.getElementById('modalImg').src = currentGallery[currentIndex]; }
+
     const basePrices = { "ストーン": 20000, "グリフォン": 20000, "ベッカー": 22000, "ビリー": 22000, "TFS": 29000, "ジョーカーF": 44000, "ジョーカーXL": 47000 };
     const solidPrices = { "ストーン": 15000, "グリフォン": 15000, "ベッカー": 17000, "ビリー": 17000, "TFS": 22000, "ジョーカーF": 36000, "ジョーカーXL": 39000 };
-    const designs = [ {n:"特定デザイン", k:"p_design", p:4000}, {n:"普通デザイン", k:"o_design", p:2000}, {n:"社内定型ぼかし", k:"n1", p:2000}, {n:"社内定型はっきり", k:"n2", p:3000}, {n:"社内オリぼかし", k:"n3", p:3000}, {n:"社内オリはっきり", k:"n4", p:4000}, {n:"社外フォント", k:"n5", p:5000}, {n:"オリジナルロゴ", k:"n6", p:8000} ];
+    const textOptions = [ {n:"社内定型ぼかし", k:"n1", p:2000}, {n:"社内定型はっきり", k:"n2", p:3000}, {n:"社内オリぼかし", k:"n3", p:3000}, {n:"社内オリはっきり", k:"n4", p:4000}, {n:"社外フォント", k:"n5", p:5000}, {n:"オリジナルロゴ", k:"n6", p:8000} ];
+    const designPrices = { "none": 0, "normal": 2000, "special": 4000 };
 
-    let state = { model: "ストーン", mode: "custom", taxOn: true, adjType: 1, adjValue: 0, counts: { pearl:0, candy:0, flake:0, wrap:0, p_design:0, o_design:0, n1:0, n2:0, n3:0, n4:0, n5:0, n6:0 } };
+    let state = {
+        model: "ストーン", mode: "custom", taxOn: true,
+        sideSync: true, sideSame: "none", sideL: "none", sideR: "none", back: "none",
+        adjType: 1, adjValue: 0,
+        textCounts: { n1:0, n2:0, n3:0, n4:0, n5:0, n6:0 },
+        colors: { pearl:0, candy:0, flake:0, wrap:0 }
+    };
 
     function init() {
         const mGrid = document.getElementById('model-grid');
         Object.keys(basePrices).forEach(m => {
             const btn = document.createElement('div');
             btn.className = `btn-select ${state.model === m ? 'active' : ''}`;
-            btn.innerHTML = `${m}`;
+            btn.innerText = m;
             btn.onclick = () => { state.model = m; render(); };
             mGrid.appendChild(btn);
         });
-        const dBox = document.getElementById('design-counters');
-        designs.forEach(d => {
+        const tBox = document.getElementById('text-counters');
+        textOptions.forEach(o => {
             const row = document.createElement('div');
             row.className = 'counter-row';
-            row.innerHTML = `<span>${d.n}<br><small style="color:#888">+¥${d.p.toLocaleString()}</small></span>
+            row.innerHTML = `<span>${o.n}<br><small style="color:#888">+¥${o.p.toLocaleString()}</small></span>
                              <div class="counter-controls">
-                                <button class="btn-count" onclick="updateCount('${d.k}', -1)">-</button>
-                                <div class="count-val" id="val-${d.k}">0</div>
-                                <button class="btn-count" onclick="updateCount('${d.k}', 1)">+</button>
+                                <button class="btn-count" onclick="updateTextCount('${o.k}', -1)">-</button>
+                                <div class="count-val" id="val-${o.k}">0</div>
+                                <button class="btn-count" onclick="updateTextCount('${o.k}', 1)">+</button>
                              </div>`;
-            dBox.appendChild(row);
+            tBox.appendChild(row);
         });
         render();
     }
 
-    function toggleColor(key) {
-        if (key === 'pearl') { const curr = state.counts.pearl; resetColors(); state.counts.pearl = curr === 1 ? 0 : 1; }
-        else if (key === 'candy') { state.counts.pearl = 0; state.counts.candy = state.counts.candy === 1 ? 0 : 1; }
-        else if (key === 'flake') { state.counts.pearl = 0; state.counts.wrap = 0; state.counts.flake = state.counts.flake === 1 ? 0 : 1; }
-        else if (key === 'wrap') { state.counts.pearl = 0; state.counts.flake = 0; state.counts.wrap = state.counts.wrap === 1 ? 0 : 1; }
+    function setSideSync(sync) { state.sideSync = sync; render(); }
+    function setSideDesign(pos, type) {
+        if(pos === 'same') state.sideSame = type;
+        else if(pos === 'l') state.sideL = type;
+        else if(pos === 'r') state.sideR = type;
         render();
     }
-    function resetColors() { state.counts.pearl = 0; state.counts.candy = 0; state.counts.flake = 0; state.counts.wrap = 0; }
+    function setBackDesign(type) { state.back = type; render(); }
+    function toggleColor(key) {
+        if (key === 'pearl') { const c = state.colors.pearl; Object.keys(state.colors).forEach(k=>state.colors[k]=0); state.colors.pearl = c ? 0 : 1; }
+        else {
+            state.colors.pearl = 0;
+            if (key === 'flake') state.colors.wrap = 0;
+            if (key === 'wrap') state.colors.flake = 0;
+            state.colors[key] = state.colors[key] ? 0 : 1;
+        }
+        render();
+    }
+    function updateTextCount(k, d) { state.textCounts[k] = Math.max(0, state.textCounts[k] + d); render(); }
     function setMode(m) { state.mode = m; render(); }
     function toggleTax() { state.taxOn = !state.taxOn; render(); }
-    function updateCount(key, delta) { state.counts[key] = Math.max(0, state.counts[key] + delta); render(); }
-    
     function setAdjType(t) { state.adjType = t; render(); }
     function updateAdjValue() { state.adjValue = Number(document.getElementById('adj-input').value) || 0; render(); }
     function clearAdj() { document.getElementById('adj-input').value = ""; state.adjValue = 0; render(); }
 
     function resetAll() {
-        state.model="ストーン"; state.mode="custom"; state.adjType=1; clearAdj();
-        Object.keys(state.counts).forEach(k=>state.counts[k]=0);
+        state.model="ストーン"; state.mode="custom"; state.sideSync=true; state.sideSame="none"; state.sideL="none"; state.sideR="none"; state.back="none";
+        state.adjType=1; clearAdj(); Object.keys(state.textCounts).forEach(k=>state.textCounts[k]=0); Object.keys(state.colors).forEach(k=>state.colors[k]=0);
         render();
     }
 
@@ -187,18 +309,31 @@
         document.getElementById('mode-solid').classList.toggle('active', state.mode === 'solid');
         document.getElementById('custom-options').style.display = state.mode === 'custom' ? 'block' : 'none';
         document.getElementById('tax-btn').classList.toggle('active', state.taxOn);
-        document.getElementById('tax-label').innerText = state.taxOn ? '合計 (税込)' : '合計 (税抜)';
         
+        document.getElementById('side-sync-yes').classList.toggle('active', state.sideSync);
+        document.getElementById('side-sync-no').classList.toggle('active', !state.sideSync);
+        document.getElementById('side-same-area').style.display = state.sideSync ? 'block' : 'none';
+        document.getElementById('side-diff-area').style.display = state.sideSync ? 'none' : 'block';
+
+        ['same','l','r'].forEach(p => {
+            ['none','normal','special'].forEach(t => {
+                const el = document.getElementById(`side-${p}-${t}`);
+                if(el) el.classList.toggle('active', state[`side${p.charAt(0).toUpperCase() + p.slice(1)}`] === t);
+            });
+        });
+        ['none','normal','special'].forEach(t => document.getElementById(`back-${t}`).classList.toggle('active', state.back === t));
+        Object.keys(state.colors).forEach(k => document.getElementById(`btn-${k}`).classList.toggle('active', state.colors[k] === 1));
+        Object.keys(state.textCounts).forEach(k => document.getElementById(`val-${k}`).innerText = state.textCounts[k]);
         document.getElementById('adj-plus').classList.toggle('active', state.adjType === 1);
         document.getElementById('adj-minus').classList.toggle('active', state.adjType === -1);
 
-        ['pearl','candy','flake','wrap'].forEach(k => document.getElementById(`btn-${k}`).classList.toggle('active', state.counts[k] === 1));
-        Object.keys(state.counts).forEach(k => { const el = document.getElementById(`val-${k}`); if(el) el.innerText = state.counts[k]; });
-
         let total = (state.mode === 'solid' ? solidPrices[state.model] : basePrices[state.model]);
         if(state.mode === 'custom') {
-            total += state.counts.pearl*2000 + state.counts.candy*2000 + state.counts.flake*4000 + state.counts.wrap*4000;
-            designs.forEach(d => total += state.counts[d.k] * d.p);
+            total += state.colors.pearl*2000 + state.colors.candy*2000 + state.colors.flake*4000 + state.colors.wrap*4000;
+            if(state.sideSync) total += designPrices[state.sideSame];
+            else total += designPrices[state.sideL] + designPrices[state.sideR];
+            total += designPrices[state.back];
+            textOptions.forEach(o => total += state.textCounts[o.k] * o.p);
             total += (state.adjType * state.adjValue);
         }
         if(state.taxOn) total *= 1.1;
