@@ -5,77 +5,178 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Third-Eye 塗装シミュレーター</title>
     <style>
-        :root { --primary-color: #32CD32; --bg-color: #1e1e1e; --panel-bg: #000; --card-bg: #2d2d2d; --text-color: #fff; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { margin: 0; padding: 0; height: 100%; width: 100%; font-family: sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow: hidden; }
+        :root {
+            --win-bg: #f3f3f3; /* Windowsの薄グレー背景 */
+            --win-panel-bg: rgba(255, 255, 255, 0.7); /* 少し透けた白 */
+            --win-btn-bg: #ffffff; /* 通常ボタン */
+            --win-btn-hover: #f9f9f9;
+            --win-btn-active: #dcdcdc; /* 選択中（Windowsのアクセントカラー風に） */
+            --win-btn-reset: #a12c2c; /* ACボタン（画像のエッジカラー風） */
+            --win-text: #000000;
+            --win-border: #e1e1e1;
+            --win-tax-active: #a12c2c; /* 税込ボタンも画像の色に */
+        }
 
-        /* 上部固定パネル */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        
+        html, body {
+            margin: 0; padding: 0; height: 100%; width: 100%;
+            font-family: 'Segoe UI', 'Roboto', sans-serif; /* Windows風フォント */
+            background-color: var(--win-bg);
+            color: var(--win-text);
+            overflow: hidden;
+        }
+
+        /* --- 上部固定：Windows電卓のヘッダー＆表示エリア --- */
         .header-panel {
             position: absolute; top: 0; left: 0; width: 100%; height: 180px;
-            background-color: var(--panel-bg); z-index: 1000;
-            border-bottom: 3px solid var(--primary-color);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background-color: var(--win-panel-bg); z-index: 1000;
+            backdrop-filter: blur(10px); /* 磨りガラス効果 */
+            border-bottom: 1px solid var(--win-border);
+            display: flex; flex-direction: column; padding: 10px;
         }
-        .price-display { font-family: 'Courier New', monospace; font-size: 50px; font-weight: bold; color: var(--primary-color); line-height: 1; }
-        .top-controls { display: flex; gap: 10px; margin-top: 15px; width: 90%; max-width: 400px; }
-        .top-btn { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #555; background: #333; color: white; font-weight: bold; text-align: center; cursor: pointer; font-size: 14px; }
-        .top-btn.active { background: var(--primary-color); color: black; border: none; }
-        .top-btn.reset { border-color: #ff4b4b; color: #ff4b4b; }
 
-        /* メインスクロールエリア */
-        .main-content { position: absolute; top: 180px; bottom: 0; left: 0; width: 100%; overflow-y: scroll; padding: 20px 15px 120px; -webkit-overflow-scrolling: touch; }
-        h2 { font-size: 18px; border-left: 4px solid var(--primary-color); padding-left: 10px; margin: 25px 0 15px; color: #fff; }
-        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .btn-select { background: #333; border: 1px solid #555; color: white; padding: 15px 5px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; text-align: center; min-height: 50px; display: flex; align-items: center; justify-content: center; }
-        .btn-select.active { background: var(--primary-color); color: black; border: none; }
+        /* 「標準」などのタイトルエリア */
+        .win-title {
+            font-size: 14px; color: #555; display: flex; align-items: center; gap: 8px; margin-bottom: 5px;
+        }
 
-        .counter-row { background: var(--card-bg); padding: 12px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-        .counter-controls { display: flex; align-items: center; gap: 15px; }
-        .btn-count { width: 38px; height: 38px; border-radius: 50%; border: none; background: #444; color: white; font-size: 22px; cursor: pointer; }
-        .count-val { font-size: 20px; font-weight: bold; color: var(--primary-color); min-width: 30px; text-align: center; }
-        .sub-text { font-size: 11px; color: #aaa; margin-top: 8px; line-height: 1.4; }
+        /* 金額表示：右寄せ、デカ文字、太字 */
+        .price-display-container {
+            flex: 1; display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end;
+            padding-right: 15px; padding-bottom: 5px;
+        }
+        .tax-label { font-size: 12px; color: #777; margin-bottom: 2px; }
+        .price-display {
+            font-size: 55px; font-weight: 600; line-height: 1;
+        }
+
+        /* 赤枠の「税込」「AC」ボタンエリア */
+        .top-controls {
+            display: flex; gap: 8px; width: 100%; height: 45px;
+        }
+        .top-btn {
+            flex: 1; border-radius: 6px; border: 1px solid var(--win-border);
+            font-weight: 600; text-align: center; cursor: pointer; font-size: 14px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        /* 税込ボタン（未選択時：白） */
+        #tax-btn { background-color: var(--win-btn-bg); color: var(--win-text); }
+        #tax-btn:active { background-color: var(--win-btn-active); }
+        /* 税込ボタン（選択時：画像のエッジカラー） */
+        #tax-btn.active { background-color: var(--win-tax-active); color: #fff; border-color: var(--win-tax-active); }
+
+        /* ACボタン（画像のエッジカラー） */
+        .top-btn.reset { background-color: var(--win-btn-reset); color: #fff; border-color: var(--win-btn-reset); }
+        .top-btn.reset:active { background-color: #8a2525; }
+
+        /* --- 下部：メニュー（Windowsのボタン配列風） --- */
+        .main-content {
+            position: absolute; top: 180px; bottom: 0; left: 0; width: 100%;
+            overflow-y: scroll; padding: 15px 10px 100px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        h2 {
+            font-size: 16px; font-weight: 600; margin: 25px 0 10px 5px; color: #333;
+            display: flex; align-items: center; gap: 5px;
+        }
+        h2 span { font-size: 14px; opacity: 0.7; }
+
+        /* Windows風ボタンのグリッド */
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
+
+        /* Windows電卓のボタンデザイン */
+        .btn-select {
+            background-color: var(--win-btn-bg);
+            border: 1px solid var(--win-border);
+            color: var(--win-text);
+            border-radius: 6px; /* 緩やかな角丸 */
+            font-size: 13px; font-weight: 500; cursor: pointer;
+            text-align: center; min-height: 55px; /* ボタンの高さを画像に合わせる */
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            line-height: 1.2;
+            transition: 0.1s;
+        }
+        /* 選択されていないボタンがホバーされた時 */
+        .btn-select:hover:not(.active) { background-color: var(--win-btn-hover); }
+
+        /* 選択されたボタン（Windowsのアクセントカラー、画像の色を参考に） */
+        .btn-select.active {
+            background-color: #a12c2c; /* 画像の『＝』ボタンの色 */
+            color: #ffffff;
+            border-color: #a12c2c;
+            font-weight: 600;
+        }
+        /* 選択中のボタンが押された時 */
+        .btn-select.active:active { background-color: #8a2525; }
+
+        /* カウンターUIもWindows風に */
+        .counter-row {
+            background-color: #ffffff; border: 1px solid var(--win-border);
+            padding: 12px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;
+        }
+        .counter-row span { font-size: 14px; font-weight: 500; }
+        .counter-controls { display: flex; align-items: center; gap: 10px; }
+        .btn-count {
+            width: 40px; height: 40px; border-radius: 6px; border: 1px solid var(--win-border);
+            background-color: var(--win-btn-bg); color: var(--win-text); font-size: 20px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-count:active { background-color: var(--win-btn-active); }
+        .count-val {
+            font-size: 20px; font-weight: 600; color: #000; min-width: 35px; text-align: center;
+        }
+        .sub-text { font-size: 11px; color: #777; margin-top: 10px; line-height: 1.5; padding-left: 5px; }
+
     </style>
 </head>
 <body>
 
 <div class="header-panel">
-    <div id="tax-label" style="font-size:12px; color:#888; margin-bottom:5px;">合計金額 (税込)</div>
-    <div class="price-display" id="total-price">¥0</div>
+    <div class="win-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3"/><path d="M2 14h4m4-10h4m4 8h4"/></svg>
+        <span>塗装計算</span>
+    </div>
+    <div class="price-display-container">
+        <div id="tax-label" class="tax-label">合計 (税込)</div>
+        <div class="price-display" id="total-price">¥0</div>
+    </div>
     <div class="top-controls">
         <div class="top-btn active" id="tax-btn" onclick="toggleTax()">税込 (10%)</div>
-        <div class="top-btn reset" onclick="resetAll()">AC 全消去</div>
+        <div class="top-btn reset" onclick="resetAll()">AC</div>
     </div>
 </div>
 
 <div class="main-content">
     <section>
-        <h2>🏁 1. モデル選択</h2>
+        <h2>🏁 1. モデル選択 <span>(基本料金)</span></h2>
         <div class="grid-4" id="model-grid"></div>
     </section>
 
     <section>
         <h2>🛠️ 2. 塗装タイプ</h2>
         <div class="grid-2">
-            <div class="btn-select active" id="mode-custom" onclick="setMode('custom')">✨ カスタム</div>
-            <div class="btn-select" id="mode-solid" onclick="setMode('solid')">🎨 単色のみ</div>
+            <div class="btn-select active" id="mode-custom" onclick="setMode('custom')">カスタム</div>
+            <div class="btn-select" id="mode-solid" onclick="setMode('solid')">単色のみ</div>
         </div>
     </section>
 
     <div id="custom-options">
         <section>
-            <h2>🎨 3. 特殊塗装 (色選択)</h2>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <div id="btn-pearl" class="btn-select" onclick="toggleColor('pearl')" style="font-size: 15px;">パールホワイト (+2,000円)</div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div id="btn-candy" class="btn-select" onclick="toggleColor('candy')">キャンディ (+2k)</div>
-                    <div style="display: flex; flex-direction: column; gap: 5px;">
-                        <div id="btn-flake" class="btn-select" onclick="toggleColor('flake')">フレーク (+4k)</div>
-                        <div id="btn-wrap" class="btn-select" onclick="toggleColor('wrap')">ラップ (+4k)</div>
+            <h2>🎨 3. 特殊塗装 <span>(重複OK/一部除く)</span></h2>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div id="btn-pearl" class="btn-select" onclick="toggleColor('pearl')" style="min-height: 70px; font-size: 15px;">パールホワイト<br><span style='font-size:12px'>(+2k)</span></div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                    <div id="btn-candy" class="btn-select" onclick="toggleColor('candy')">キャンディ<br>(+2k)</div>
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <div id="btn-flake" class="btn-select" onclick="toggleColor('flake')">フレーク<br>(+4k)</div>
+                        <div id="btn-wrap" class="btn-select" onclick="toggleColor('wrap')">ラップ<br>(+4k)</div>
                     </div>
                 </div>
             </div>
-            <p class="sub-text">※パールは単独選択。<br>※キャンディは重複OK。フレークとラップは同時選択不可。</p>
+            <p class="sub-text">※フレークとラップの同時選択はできません。<br>※パールはキャンディ/フレーク/ラップと重複選択不可。</p>
         </section>
 
         <section>
@@ -98,14 +199,10 @@
 </div>
 
 <script>
-    const basePrices = { "ストーン": 20000, "グリフォン": 20000, "ベッカー": 22000, "ビリー": 22000, "TFS": 29000, "ジョーカー(F)": 44000, "ジョーカー(XL)": 47000 };
-    const solidPrices = { "ストーン": 15000, "グリフォン": 15000, "ベッカー": 17000, "ビリー": 17000, "TFS": 22000, "ジョーカー(F)": 36000, "ジョーカー(XL)": 39000 };
-    const designs = [
-        {n:"特定デザイン", k:"p_design", p:4000}, {n:"普通デザイン", k:"o_design", p:2000},
-        {n:"社内定型/ぼかし", k:"n1", p:2000}, {n:"社内定型/はっきり", k:"n2", p:3000},
-        {n:"社内オリ/ぼかし", k:"n3", p:3000}, {n:"社内オリ/はっきり", k:"n4", p:4000},
-        {n:"社外フォント", k:"n5", p:5000}, {n:"オリジナルロゴ", k:"n6", p:8000}
-    ];
+    // これまでの計算ロジック（そのまま維持）
+    const basePrices = { "ストーン": 20000, "グリフォン": 20000, "ベッカー": 22000, "ビリー": 22000, "TFS": 29000, "ジョーカーF": 44000, "ジョーカーXL": 47000 };
+    const solidPrices = { "ストーン": 15000, "グリフォン": 15000, "ベッカー": 17000, "ビリー": 17000, "TFS": 22000, "ジョーカーF": 36000, "ジョーカーXL": 39000 };
+    const designs = [ {n:"特定デザイン", k:"p_design", p:4000}, {n:"普通デザイン", k:"o_design", p:2000}, {n:"社内定型ぼかし", k:"n1", p:2000}, {n:"社内定型はっきり", k:"n2", p:3000}, {n:"社内オリぼかし", k:"n3", p:3000}, {n:"社内オリはっきり", k:"n4", p:4000}, {n:"社外フォント", k:"n5", p:5000}, {n:"オリジナルロゴ", k:"n6", p:8000} ];
 
     let state = { model: "ストーン", mode: "custom", taxOn: true, counts: { pearl:0, candy:0, flake:0, wrap:0, p_design:0, o_design:0, n1:0, n2:0, n3:0, n4:0, n5:0, n6:0, discount:0 } };
 
@@ -114,7 +211,7 @@
         Object.keys(basePrices).forEach(m => {
             const btn = document.createElement('div');
             btn.className = `btn-select ${state.model === m ? 'active' : ''}`;
-            btn.innerText = m;
+            btn.innerHTML = `${m}<br><span style='font-size:11px'>(¥${state.mode==='solid'?solidPrices[m].toLocaleString():basePrices[m].toLocaleString()})</span>`;
             btn.onclick = () => { state.model = m; render(); };
             mGrid.appendChild(btn);
         });
@@ -122,7 +219,7 @@
         designs.forEach(d => {
             const row = document.createElement('div');
             row.className = 'counter-row';
-            row.innerHTML = `<span>${d.n} (¥${d.p.toLocaleString()})</span>
+            row.innerHTML = `<span>${d.n} <span style='color:#777'>(+${(d.p/1000)}k)</span></span>
                              <div class="counter-controls">
                                 <button class="btn-count" onclick="updateCount('${d.k}', -1)">-</button>
                                 <div class="count-val" id="val-${d.k}">0</div>
@@ -134,15 +231,10 @@
     }
 
     function toggleColor(key) {
-        if (key === 'pearl') {
-            const curr = state.counts.pearl; resetColors(); state.counts.pearl = curr === 1 ? 0 : 1;
-        } else if (key === 'candy') {
-            state.counts.pearl = 0; state.counts.candy = state.counts.candy === 1 ? 0 : 1;
-        } else if (key === 'flake') {
-            state.counts.pearl = 0; state.counts.wrap = 0; state.counts.flake = state.counts.flake === 1 ? 0 : 1;
-        } else if (key === 'wrap') {
-            state.counts.pearl = 0; state.counts.flake = 0; state.counts.wrap = state.counts.wrap === 1 ? 0 : 1;
-        }
+        if (key === 'pearl') { const curr = state.counts.pearl; resetColors(); state.counts.pearl = curr === 1 ? 0 : 1;
+        } else if (key === 'candy') { state.counts.pearl = 0; state.counts.candy = state.counts.candy === 1 ? 0 : 1;
+        } else if (key === 'flake') { state.counts.pearl = 0; state.counts.wrap = 0; state.counts.flake = state.counts.flake === 1 ? 0 : 1;
+        } else if (key === 'wrap') { state.counts.pearl = 0; state.counts.flake = 0; state.counts.wrap = state.counts.wrap === 1 ? 0 : 1; }
         render();
     }
 
@@ -153,20 +245,20 @@
     function resetAll() { state.model="ストーン"; state.mode="custom"; Object.keys(state.counts).forEach(k=>state.counts[k]=0); render(); }
 
     function render() {
-        document.querySelectorAll('#model-grid .btn-select').forEach(b => b.classList.toggle('active', b.innerText === state.model));
+        document.querySelectorAll('#model-grid .btn-select').forEach((b, i) => {
+            b.classList.toggle('active', b.innerHTML.includes(state.model));
+            b.innerHTML = `${Object.keys(basePrices)[i]}<br><span style='font-size:11px'>(¥${state.mode==='solid'?solidPrices[Object.keys(basePrices)[i]].toLocaleString():basePrices[Object.keys(basePrices)[i]].toLocaleString()})</span>`;
+        });
         document.getElementById('mode-custom').classList.toggle('active', state.mode === 'custom');
         document.getElementById('mode-solid').classList.toggle('active', state.mode === 'solid');
         document.getElementById('custom-options').style.display = state.mode === 'custom' ? 'block' : 'none';
         document.getElementById('tax-btn').classList.toggle('active', state.taxOn);
         document.getElementById('tax-btn').innerText = state.taxOn ? '税込 (10%)' : '税抜表示';
+        document.getElementById('tax-label').innerText = state.taxOn ? '合計 (税込)' : '合計 (税抜)';
         ['pearl','candy','flake','wrap'].forEach(k => document.getElementById(`btn-${k}`).classList.toggle('active', state.counts[k] === 1));
         Object.keys(state.counts).forEach(k => { const el = document.getElementById(`val-${k}`); if(el) el.innerText = state.counts[k].toLocaleString(); });
         let total = state.mode === 'solid' ? solidPrices[state.model] : basePrices[state.model];
-        if(state.mode === 'custom') {
-            total += state.counts.pearl*2000 + state.counts.candy*2000 + state.counts.flake*4000 + state.counts.wrap*4000;
-            designs.forEach(d => total += state.counts[d.k] * d.p);
-            total += state.counts.discount;
-        }
+        if(state.mode === 'custom') { total += state.counts.pearl*2000 + state.counts.candy*2000 + state.counts.flake*4000 + state.counts.wrap*4000; designs.forEach(d => total += state.counts[d.k] * d.p); total += state.counts.discount; }
         if(state.taxOn) total *= 1.1;
         document.getElementById('total-price').innerText = `¥${Math.floor(total).toLocaleString()}`;
     }
