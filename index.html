@@ -55,10 +55,13 @@
         .count-val { font-size: 18px; font-weight: 600; min-width: 25px; text-align: center; }
 
         /* 最終調整UI */
-        .adj-container { display: flex; gap: 5px; align-items: center; width: 100%; }
-        .adj-type-btn { flex: 1; height: 45px; border: 1px solid var(--win-border); background: #fff; border-radius: 4px; font-weight: bold; }
+        .adj-box { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; }
+        .adj-top-row { display: flex; gap: 5px; }
+        .adj-bottom-row { display: flex; gap: 5px; align-items: center; }
+        .adj-type-btn { flex: 1; height: 45px; border: 1px solid var(--win-border); background: #fff; border-radius: 4px; font-weight: bold; font-size: 14px; }
         .adj-type-btn.active { background: #555; color: #fff; }
-        .adj-input { flex: 2; height: 45px; border: 1px solid var(--win-border); border-radius: 4px; text-align: right; padding: 0 10px; font-size: 18px; font-weight: bold; font-family: monospace; }
+        .adj-input { flex: 1; height: 50px; border: 1px solid var(--win-border); border-radius: 4px; text-align: right; padding: 0 10px; font-size: 20px; font-weight: bold; font-family: monospace; background: #fff; }
+        .adj-zero-btn { width: 60px; height: 50px; border: 1px solid var(--win-border); background: #eee; border-radius: 4px; font-weight: bold; font-size: 16px; color: #a12c2c; }
     </style>
 </head>
 <body>
@@ -111,10 +114,15 @@
 
         <section>
             <h2>5. 最終調整</h2>
-            <div class="adj-container">
-                <button id="adj-plus" class="adj-type-btn active" onclick="setAdjType(1)">＋ 加算</button>
-                <button id="adj-minus" class="adj-type-btn" onclick="setAdjType(-1)">－ 減算</button>
-                <input type="number" id="adj-input" class="adj-input" placeholder="0" oninput="updateAdjValue()" pattern="\[0-9]*" inputmode="numeric">
+            <div class="adj-box">
+                <div class="adj-top-row">
+                    <button id="adj-plus" class="adj-type-btn active" onclick="setAdjType(1)">＋ 加算</button>
+                    <button id="adj-minus" class="adj-type-btn" onclick="setAdjType(-1)">－ 減算</button>
+                </div>
+                <div class="adj-bottom-row">
+                    <input type="number" id="adj-input" class="adj-input" placeholder="数値入力" oninput="updateAdjValue()" pattern="[0-9]*" inputmode="numeric">
+                    <button class="adj-zero-btn" onclick="clearAdj()">0</button>
+                </div>
             </div>
         </section>
     </div>
@@ -165,11 +173,11 @@
     
     function setAdjType(t) { state.adjType = t; render(); }
     function updateAdjValue() { state.adjValue = Number(document.getElementById('adj-input').value) || 0; render(); }
+    function clearAdj() { document.getElementById('adj-input').value = ""; state.adjValue = 0; render(); }
 
     function resetAll() {
-        state.model="ストーン"; state.mode="custom"; state.adjType=1; state.adjValue=0;
+        state.model="ストーン"; state.mode="custom"; state.adjType=1; clearAdj();
         Object.keys(state.counts).forEach(k=>state.counts[k]=0);
-        document.getElementById('adj-input').value = "";
         render();
     }
 
