@@ -3,205 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Third-Eye 塗装シミュレーター</title>
+    <title>Third-Eye 塗装電卓</title>
     <style>
         :root {
-            --win-bg: #f3f3f3;
-            --win-panel-bg: rgba(255, 255, 255, 0.8);
+            /* 配色の再定義：コントラストを強めて視認性アップ */
+            --win-bg: #eef1f5;
+            --win-panel-bg: #ffffff;
             --win-btn-bg: #ffffff;
-            --win-btn-active: #a12c2c;
-            --win-text: #000000;
-            --win-border: #e1e1e1;
+            --win-btn-active: #b32d2d; 
+            --win-text: #2c3e50;
+            --win-border: #d1d9e6;
+            --win-shadow: 0 2px 5px rgba(0,0,0,0.08);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        html, body { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Segoe UI', sans-serif; background-color: var(--win-bg); color: var(--win-text); overflow: hidden; }
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            outline: none; 
+        }
 
+        html, body { 
+            margin: 0; padding: 0; height: 100%; width: 100%; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+            background-color: var(--win-bg); color: var(--win-text); 
+            overflow: hidden; 
+        }
+
+        /* ヘッダー：金額を最優先で見せる */
         .header-panel {
-            position: absolute; top: 0; left: 0; width: 100%; height: 180px;
+            position: absolute; top: 0; left: 0; width: 100%; height: 190px;
             background-color: var(--win-panel-bg); z-index: 1000;
-            border-bottom: 1px solid var(--win-border);
-            display: flex; flex-direction: column; padding: 10px;
+            border-bottom: 3px solid var(--win-btn-active);
+            display: flex; flex-direction: column; padding: 12px 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        .win-title { font-size: 14px; color: #555; margin-bottom: 5px; font-weight: 500; }
-        .price-display-container { flex: 1; display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end; padding-right: 15px; }
-        .tax-label { font-size: 12px; color: #777; }
-        .price-display { font-size: 50px; font-weight: 600; }
 
-        .top-controls { display: flex; gap: 8px; width: 100%; height: 45px; margin-top: 10px; }
-        .top-btn { flex: 1; border-radius: 4px; border: 1px solid var(--win-border); font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; background: #fff; }
-        #tax-btn.active { background-color: var(--win-btn-active); color: #fff; border-color: var(--win-btn-active); }
-        .reset-btn { background-color: #a12c2c; color: #fff; border-color: #a12c2c; }
+        .win-title { font-size: 11px; color: #888; letter-spacing: 1px; margin-bottom: 5px; font-weight: bold; }
+        
+        .selected-summary {
+            font-size: 13px; color: var(--win-btn-active); text-align: right; 
+            width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+            margin-bottom: 2px; font-weight: 800;
+        }
 
-        .main-content { position: absolute; top: 180px; bottom: 0; left: 0; width: 100%; overflow-y: auto; padding: 10px 10px 150px; }
-        h2 { font-size: 15px; font-weight: 600; margin: 25px 0 10px 5px; color: #333; border-left: 3px solid #a12c2c; padding-left: 8px; }
-        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
-        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
+        .price-display-container { 
+            flex: 1; display: flex; flex-direction: column; 
+            align-items: flex-end; justify-content: center; 
+        }
+        .tax-label { font-size: 13px; color: #666; font-weight: bold; margin-bottom: -5px; }
+        .price-display { 
+            font-size: 52px; font-weight: 900; line-height: 1; color: #000;
+            letter-spacing: -1px;
+        }
 
+        .top-controls { display: flex; gap: 10px; width: 100%; height: 48px; margin-top: 8px; }
+        .top-btn { 
+            flex: 1; border-radius: 8px; border: 1px solid var(--win-border); 
+            font-weight: 800; font-size: 14px; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; 
+            background: #fff; transition: all 0.2s;
+            box-shadow: var(--win-shadow);
+        }
+        #tax-btn.active { background-color: #2c3e50; color: #fff; border-color: #2c3e50; }
+        .reset-btn { background-color: var(--win-btn-active); color: #fff; border-color: var(--win-btn-active); }
+
+        /* メイン：セクションの区切りを明確に */
+        .main-content { 
+            position: absolute; top: 190px; bottom: 0; left: 0; width: 100%; 
+            overflow-y: auto; padding: 10px 12px 160px; 
+            scroll-behavior: smooth;
+        }
+
+        h2 { 
+            font-size: 16px; font-weight: 800; margin: 30px 0 12px 2px; 
+            color: #333; border-left: 5px solid var(--win-btn-active); padding-left: 10px;
+        }
+
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+
+        /* ボタン：文字を大きく、タップしやすく */
         .btn-select {
             background-color: var(--win-btn-bg); border: 1px solid var(--win-border);
-            border-radius: 4px; font-size: 12px; font-weight: 500; cursor: pointer;
-            min-height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;
+            min-height: 58px; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center;
+            position: relative; box-shadow: var(--win-shadow);
+            transition: all 0.1s;
         }
-        .btn-select.active { background-color: var(--win-btn-active); color: #fff; border: none; }
-        .btn-select span { font-size: 10px; margin-top: 2px; opacity: 0.8; }
+        .btn-select.active { 
+            background-color: var(--win-btn-active); color: #fff; 
+            border: none; transform: translateY(1px);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .btn-select span { font-size: 11px; margin-top: 3px; opacity: 0.9; font-weight: normal; }
 
-        .sub-group { background: #ebebeb; padding: 8px; border-radius: 4px; margin-bottom: 4px; }
-        .sub-label { font-size: 11px; font-weight: bold; color: #666; margin-bottom: 5px; display: block; }
-        
-        /* 特定デザインの注釈とiボタン */
-        .design-note { font-size: 12px; color: #444; margin-top: 8px; background: #fff; padding: 10px; border-radius: 4px; border-left: 3px solid #ccc; }
-        .info-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; list-style: none; padding: 0; }
-        .info-item { background: #f0f0f0; padding: 4px 8px; border-radius: 4px; display: flex; align-items: center; gap: 4px; font-size: 11px; }
-        .i-icon { width: 18px; height: 18px; background: #a12c2c; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; cursor: pointer; }
+        /* 文字入れバッジ：目立たせる */
+        .text-count-badge {
+            position: absolute; top: -6px; right: -6px; 
+            background: #000; color: #fff; border: 2px solid #fff;
+            font-size: 11px; min-width: 22px; height: 22px; 
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 12px; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .btn-select.has-count { border: 2.5px solid var(--win-btn-active); color: var(--win-btn-active); background: #fff; }
 
-        /* 画像モーダル */
-        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
-        .modal-content { position: relative; max-width: 90%; max-height: 80%; }
-        .modal-img { width: 100%; border-radius: 4px; }
-        .modal-close { position: absolute; top: -40px; right: 0; color: #fff; font-size: 30px; cursor: pointer; }
-        .modal-nav { position: absolute; top: 50%; width: 100%; display: flex; justify-content: space-between; transform: translateY(-50%); pointer-events: none; }
-        .nav-btn { background: rgba(255,255,255,0.3); color: #fff; border: none; padding: 15px; cursor: pointer; pointer-events: auto; }
+        /* サブグループ：階層構造を視覚化 */
+        .sub-group { 
+            background: #e0e6ed; padding: 10px; border-radius: 10px; 
+            margin-bottom: 8px; border: 1px solid rgba(0,0,0,0.05);
+        }
+        .sub-label { font-size: 12px; font-weight: 800; color: #5a6c7d; margin-bottom: 8px; display: block; }
 
-        .counter-row { background-color: #fff; border: 1px solid var(--win-border); padding: 10px; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-        .counter-controls { display: flex; align-items: center; gap: 8px; }
-        .btn-count { width: 35px; height: 35px; border: 1px solid var(--win-border); background: #f9f9f9; border-radius: 4px; font-size: 18px; }
-        .count-val { font-size: 18px; font-weight: 600; min-width: 25px; text-align: center; }
-
+        /* 数値入力エリア */
         .adj-box { display: flex; flex-direction: column; gap: 8px; }
-        .adj-top-row { display: flex; gap: 5px; }
-        .adj-bottom-row { display: flex; gap: 5px; align-items: center; }
-        .adj-type-btn { flex: 1; height: 45px; border: 1px solid var(--win-border); background: #fff; border-radius: 4px; font-weight: bold; }
-        .adj-input { flex: 1; height: 50px; border: 1px solid var(--win-border); border-radius: 4px; text-align: right; padding: 0 10px; font-size: 20px; font-weight: bold; background: #fff; }
-        .adj-zero-btn { width: 60px; height: 50px; border: 1px solid var(--win-border); background: #eee; border-radius: 4px; font-weight: bold; color: #a12c2c; }
+        .adj-top-row { display: flex; gap: 8px; }
+        .adj-bottom-row { display: flex; gap: 8px; align-items: center; }
+        .adj-type-btn { 
+            flex: 1; height: 48px; border: 1px solid var(--win-border); 
+            background: #fff; border-radius: 8px; font-weight: 800; cursor: pointer; 
+        }
+        .adj-type-btn.active { background-color: #2c3e50; color: #fff; border-color: #2c3e50; }
+        .adj-input { 
+            flex: 1; height: 58px; border: 2px solid var(--win-border); 
+            border-radius: 8px; text-align: center; font-size: 24px; 
+            font-weight: 800; background: #fff; color: var(--win-btn-active);
+        }
+        .adj-zero-btn { 
+            width: 70px; height: 58px; border: 1px solid var(--win-border); 
+            background: #d1d9e6; border-radius: 8px; font-weight: 800; color: #333; 
+        }
     </style>
 </head>
 <body>
 
-<div id="imageModal" class="modal">
-    <div class="modal-content">
-        <span class="modal-close" onclick="closeModal()">×</span>
-        <img id="modalImg" class="modal-img">
-        <div class="modal-nav" id="modalNav">
-            <button class="nav-btn" onclick="changeImg(-1)">◀</button>
-            <button class="nav-btn" onclick="changeImg(1)">▶</button>
-        </div>
-    </div>
-</div>
-
 <div class="header-panel">
-    <div class="win-title">標準電卓 / 塗装シミュレーター</div>
+    <div class="win-title">Third-Eye 塗装電卓 v2.0</div>
     <div class="price-display-container">
+        <div id="selected-summary" class="selected-summary"></div>
         <div id="tax-label" class="tax-label">合計 (税込)</div>
         <div class="price-display" id="total-price">¥0</div>
     </div>
     <div class="top-controls">
         <div class="top-btn active" id="tax-btn" onclick="toggleTax()">税込 (10%)</div>
-        <div class="top-btn reset-btn" onclick="resetAll()">AC</div>
+        <div class="top-btn reset-btn" onclick="resetAll()">リセット</div>
     </div>
 </div>
 
 <div class="main-content">
     <section>
-        <h2>1. モデル選択</h2>
+        <h2>1. 帽体モデル</h2>
         <div class="grid-4" id="model-grid"></div>
     </section>
 
     <section>
-        <h2>2. 塗装タイプ</h2>
+        <h2>2. オーダー形式</h2>
         <div class="grid-2">
             <div class="btn-select active" id="mode-custom" onclick="setMode('custom')">カスタム</div>
-            <div class="btn-select" id="mode-solid" onclick="setMode('solid')">単色のみ</div>
+            <div class="btn-select" id="mode-solid" onclick="setMode('solid')">単色</div>
         </div>
     </section>
 
+    <!-- 単色用パネル -->
+    <div id="solid-options" style="display:none;">
+        <section>
+            <h2>3. 単色カラー</h2>
+            <div class="grid-2">
+                <div id="btn-s-black" class="btn-select" onclick="setSolidColor('ブラック')">ブラック</div>
+                <div id="btn-s-white" class="btn-select" onclick="setSolidColor('ホワイト')">ホワイト</div>
+                <div id="btn-s-ivory" class="btn-select" onclick="setSolidColor('アイボリー')">アイボリー</div>
+                <div id="btn-s-pearl" class="btn-select" onclick="setSolidColor('パール')">パール入り<span id="pearl-price-label"></span></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- カスタム用パネル -->
     <div id="custom-options">
         <section>
-            <h2>3. 特殊塗装</h2>
-            <div class="grid-2">
-                <div id="btn-pearl" class="btn-select" onclick="toggleColor('pearl')">パールホワイト<span>+¥2,000</span></div>
-                <div id="btn-candy" class="btn-select" onclick="toggleColor('candy')">キャンディ<span>+¥2,000</span></div>
-                <div id="btn-flake" class="btn-select" onclick="toggleColor('flake')">フレーク<span>+¥4,000</span></div>
-                <div id="btn-wrap" class="btn-select" onclick="toggleColor('wrap')">ラップ<span>+¥4,000</span></div>
+            <h2>3. カスタム色</h2>
+            <div class="sub-group">
+                <span class="sub-label">ベースカラー</span>
+                <div class="grid-3">
+                    <div id="btn-black" class="btn-select" onclick="toggleColor('black')">ブラック</div>
+                    <div id="btn-gunmetal" class="btn-select" onclick="toggleColor('gunmetal')">ガンメタ</div>
+                    <div id="btn-silver" class="btn-select" onclick="toggleColor('silver')">シルバー</div>
+                </div>
+            </div>
+            <div class="sub-group" style="margin-top:10px;">
+                <span class="sub-label">オプションベースカラー</span>
+                <div class="grid-2">
+                    <div id="btn-pearl" class="btn-select" onclick="toggleColor('pearl')">パールホワイト<span>+¥2,000</span></div>
+                    <div id="btn-candy" class="btn-select" onclick="toggleColor('candy')">キャンディ・ネオン<span>+¥2,000</span></div>
+                    <div id="btn-flake" class="btn-select" onclick="toggleColor('flake')">フレーク<span>+¥4,000</span></div>
+                    <div id="btn-wrap" class="btn-select" onclick="toggleColor('wrap')">ラップ<span>+¥4,000</span></div>
+                </div>
             </div>
         </section>
 
         <section>
-            <h2>4. デザイン選択 (部位別)</h2>
+            <h2>4. デザイン選択</h2>
             <div class="sub-group">
                 <span class="sub-label">左右の構成</span>
                 <div class="grid-2">
-                    <div id="side-sync-yes" class="btn-select active" onclick="setSideSync(true)">左右同じ</div>
-                    <div id="side-sync-no" class="btn-select" onclick="setSideSync(false)">左右別々</div>
+                    <div id="side-sync-yes" class="btn-select active" onclick="setSideSync(true)">両サイド同じ</div>
+                    <div id="side-sync-no" class="btn-select" onclick="setSideSync(false)">サイド別々</div>
                 </div>
             </div>
-
             <div id="side-same-area" class="sub-group">
-                <span class="sub-label">左右デザインの内容</span>
+                <span class="sub-label">サイド</span>
                 <div class="grid-3">
                     <div id="side-same-none" class="btn-select active" onclick="setSideDesign('same', 'none')">なし</div>
                     <div id="side-same-normal" class="btn-select" onclick="setSideDesign('same', 'normal')">普通<span>+¥2,000</span></div>
                     <div id="side-same-special" class="btn-select" onclick="setSideDesign('same', 'special')">特定<span>+¥4,000</span></div>
                 </div>
             </div>
-
             <div id="side-diff-area" style="display:none;">
-                <div class="sub-group">
-                    <span class="sub-label">左(L) デザイン</span>
-                    <div class="grid-3">
-                        <div id="side-l-none" class="btn-select active" onclick="setSideDesign('l', 'none')">なし</div>
-                        <div id="side-l-normal" class="btn-select" onclick="setSideDesign('l', 'normal')">普通<span>+¥2,000</span></div>
-                        <div id="side-l-special" class="btn-select" onclick="setSideDesign('l', 'special')">特定<span>+¥4,000</span></div>
-                    </div>
-                </div>
-                <div class="sub-group">
-                    <span class="sub-label">右(R) デザイン</span>
-                    <div class="grid-3">
-                        <div id="side-r-none" class="btn-select active" onclick="setSideDesign('r', 'none')">なし</div>
-                        <div id="side-r-normal" class="btn-select" onclick="setSideDesign('r', 'normal')">普通<span>+¥2,000</span></div>
-                        <div id="side-r-special" class="btn-select" onclick="setSideDesign('r', 'special')">特定<span>+¥4,000</span></div>
-                    </div>
-                </div>
+                <div class="sub-group"><span class="sub-label">左(L)</span><div class="grid-3"><div id="side-l-none" class="btn-select active" onclick="setSideDesign('l', 'none')">なし</div><div id="side-l-normal" class="btn-select" onclick="setSideDesign('l', 'normal')">普通</div><div id="side-l-special" class="btn-select" onclick="setSideDesign('l', 'special')">特定</div></div></div>
+                <div class="sub-group"><span class="sub-label">右(R)</span><div class="grid-3"><div id="side-r-none" class="btn-select active" onclick="setSideDesign('r', 'none')">なし</div><div id="side-r-normal" class="btn-select" onclick="setSideDesign('r', 'normal')">普通</div><div id="side-r-special" class="btn-select" onclick="setSideDesign('r', 'special')">特定</div></div></div>
             </div>
-
             <div class="sub-group">
-                <span class="sub-label">バック デザイン</span>
+                <span class="sub-label">バック</span>
                 <div class="grid-3">
                     <div id="back-none" class="btn-select active" onclick="setBackDesign('none')">なし</div>
                     <div id="back-normal" class="btn-select" onclick="setBackDesign('normal')">普通<span>+¥2,000</span></div>
                     <div id="back-special" class="btn-select" onclick="setBackDesign('special')">特定<span>+¥4,000</span></div>
                 </div>
             </div>
-
-            <div class="design-note">
-                <strong>特定デザイン詳細（iで写真表示）：</strong>
-                <div class="info-list">
-                    <div class="info-item">ウイング <div class="i-icon" onclick="openModal('wing')">i</div></div>
-                    <div class="info-item">リーフ3 <div class="i-icon" onclick="openModal('leaf')">i</div></div>
-                    <div class="info-item">スカルズ <div class="i-icon" onclick="openModal('skulls')">i</div></div>
-                    <div class="info-item">ウイングスカル <div class="i-icon" onclick="openModal('wingskull')">i</div></div>
-                    <div class="info-item">ローズ1 <div class="i-icon" onclick="openModal('rose')">i</div></div>
-                    <div class="info-item">エンブレムクロス <div class="i-icon" onclick="openModal('cross')">i</div></div>
-                </div>
-            </div>
         </section>
 
         <section>
-            <h2>5. 文字入れ (個数)</h2>
-            <div id="text-counters"></div>
+            <h2>5. 文字入れ</h2>
+            <div class="grid-2" id="text-grid"></div>
         </section>
 
         <section>
             <h2>6. 最終調整</h2>
             <div class="adj-box">
                 <div class="adj-top-row">
-                    <button id="adj-plus" class="adj-type-btn active" onclick="setAdjType(1)">＋ 加算</button>
+                    <button id="adj-plus" class="adj-type-btn" onclick="setAdjType(1)">＋ 加算</button>
                     <button id="adj-minus" class="adj-type-btn" onclick="setAdjType(-1)">－ 減算</button>
                 </div>
                 <div class="adj-bottom-row">
-                    <input type="number" id="adj-input" class="adj-input" placeholder="数値入力" oninput="updateAdjValue()" inputmode="numeric">
-                    <button class="adj-zero-btn" onclick="clearAdj()">0</button>
+                    <input type="number" id="adj-input" class="adj-input" placeholder="0" oninput="updateAdjValue()" inputmode="numeric">
+                    <button class="adj-zero-btn" onclick="clearAdj()">クリア</button>
                 </div>
             </div>
         </section>
@@ -209,32 +254,6 @@
 </div>
 
 <script>
-    const images = {
-        wing: ["https://img07.shop-pro.jp/PA01445/472/etc_base64/U0lERV8wMQ.jpg", "https://img07.shop-pro.jp/PA01445/472/etc_base64/U0lERV8wMg.jpg"],
-        leaf: ["https://img07.shop-pro.jp/PA01445/472/etc_base64/U0lERV8wNw.jpg"],
-        skulls: ["https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18wOQ.jpg"],
-        wingskull: ["https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18xMQ.jpg"],
-        rose: ["https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18xNg.jpg"],
-        cross: ["https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18xOQ.jpg", "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18yMA.jpg"]
-    };
-
-    let currentGallery = [];
-    let currentIndex = 0;
-
-    function openModal(key) {
-        currentGallery = images[key];
-        currentIndex = 0;
-        document.getElementById('imageModal').style.display = 'flex';
-        document.getElementById('modalNav').style.display = currentGallery.length > 1 ? 'flex' : 'none';
-        updateModalImg();
-    }
-    function closeModal() { document.getElementById('imageModal').style.display = 'none'; }
-    function changeImg(dir) {
-        currentIndex = (currentIndex + dir + currentGallery.length) % currentGallery.length;
-        updateModalImg();
-    }
-    function updateModalImg() { document.getElementById('modalImg').src = currentGallery[currentIndex]; }
-
     const basePrices = { "ストーン": 20000, "グリフォン": 20000, "ベッカー": 22000, "ビリー": 22000, "TFS": 29000, "ジョーカーF": 44000, "ジョーカーXL": 47000 };
     const solidPrices = { "ストーン": 15000, "グリフォン": 15000, "ベッカー": 17000, "ビリー": 17000, "TFS": 22000, "ジョーカーF": 36000, "ジョーカーXL": 39000 };
     const textOptions = [ {n:"社内定型ぼかし", k:"n1", p:2000}, {n:"社内定型はっきり", k:"n2", p:3000}, {n:"社内オリぼかし", k:"n3", p:3000}, {n:"社内オリはっきり", k:"n4", p:4000}, {n:"社外フォント", k:"n5", p:5000}, {n:"オリジナルロゴ", k:"n6", p:8000} ];
@@ -242,33 +261,58 @@
 
     let state = {
         model: "ストーン", mode: "custom", taxOn: true,
+        solidColor: "ブラック",
         sideSync: true, sideSame: "none", sideL: "none", sideR: "none", back: "none",
         adjType: 1, adjValue: 0,
         textCounts: { n1:0, n2:0, n3:0, n4:0, n5:0, n6:0 },
-        colors: { pearl:0, candy:0, flake:0, wrap:0 }
+        colors: { black:0, gunmetal:0, silver:0, pearl:0, candy:0, flake:0, wrap:0 }
     };
 
     function init() {
         const mGrid = document.getElementById('model-grid');
         Object.keys(basePrices).forEach(m => {
             const btn = document.createElement('div');
-            btn.className = `btn-select ${state.model === m ? 'active' : ''}`;
+            btn.className = 'btn-select';
             btn.innerText = m;
             btn.onclick = () => { state.model = m; render(); };
             mGrid.appendChild(btn);
         });
-        const tBox = document.getElementById('text-counters');
+
+        const tGrid = document.getElementById('text-grid');
         textOptions.forEach(o => {
-            const row = document.createElement('div');
-            row.className = 'counter-row';
-            row.innerHTML = `<span>${o.n}<br><small style="color:#888">+¥${o.p.toLocaleString()}</small></span>
-                             <div class="counter-controls">
-                                <button class="btn-count" onclick="updateTextCount('${o.k}', -1)">-</button>
-                                <div class="count-val" id="val-${o.k}">0</div>
-                                <button class="btn-count" onclick="updateTextCount('${o.k}', 1)">+</button>
-                             </div>`;
-            tBox.appendChild(row);
+            const btn = document.createElement('div');
+            btn.className = 'btn-select';
+            btn.id = `btn-text-${o.k}`;
+            btn.innerHTML = `${o.n}<span>+¥${o.p.toLocaleString()}</span><div class="text-count-badge" id="badge-${o.k}">0</div>`;
+            btn.onclick = () => { state.textCounts[o.k]++; render(); };
+            btn.oncontextmenu = (e) => { e.preventDefault(); state.textCounts[o.k] = 0; render(); };
+            tGrid.appendChild(btn);
         });
+        render();
+    }
+
+    function setSolidColor(color) { state.solidColor = color; render(); }
+
+    function toggleColor(key) {
+        const basics = ['black', 'gunmetal', 'silver'];
+        const options = ['pearl', 'candy', 'flake', 'wrap'];
+        if (state.colors[key] === 1) {
+            state.colors[key] = 0;
+        } else {
+            if (basics.includes(key)) {
+                basics.forEach(k => state.colors[k] = 0);
+                options.forEach(k => state.colors[k] = 0);
+            } else if (options.includes(key)) {
+                basics.forEach(k => state.colors[k] = 0);
+                if (key === 'pearl') options.forEach(k => state.colors[k] = 0);
+                else {
+                    state.colors.pearl = 0;
+                    if (key === 'flake') state.colors.wrap = 0;
+                    if (key === 'wrap') state.colors.flake = 0;
+                }
+            }
+            state.colors[key] = 1;
+        }
         render();
     }
 
@@ -280,17 +324,6 @@
         render();
     }
     function setBackDesign(type) { state.back = type; render(); }
-    function toggleColor(key) {
-        if (key === 'pearl') { const c = state.colors.pearl; Object.keys(state.colors).forEach(k=>state.colors[k]=0); state.colors.pearl = c ? 0 : 1; }
-        else {
-            state.colors.pearl = 0;
-            if (key === 'flake') state.colors.wrap = 0;
-            if (key === 'wrap') state.colors.flake = 0;
-            state.colors[key] = state.colors[key] ? 0 : 1;
-        }
-        render();
-    }
-    function updateTextCount(k, d) { state.textCounts[k] = Math.max(0, state.textCounts[k] + d); render(); }
     function setMode(m) { state.mode = m; render(); }
     function toggleTax() { state.taxOn = !state.taxOn; render(); }
     function setAdjType(t) { state.adjType = t; render(); }
@@ -298,46 +331,74 @@
     function clearAdj() { document.getElementById('adj-input').value = ""; state.adjValue = 0; render(); }
 
     function resetAll() {
-        state.model="ストーン"; state.mode="custom"; state.sideSync=true; state.sideSame="none"; state.sideL="none"; state.sideR="none"; state.back="none";
-        state.adjType=1; clearAdj(); Object.keys(state.textCounts).forEach(k=>state.textCounts[k]=0); Object.keys(state.colors).forEach(k=>state.colors[k]=0);
+        state.model="ストーン"; state.mode="custom"; state.solidColor="ブラック";
+        state.sideSync=true; state.sideSame="none"; state.sideL="none"; state.sideR="none"; state.back="none";
+        state.adjType=1; clearAdj(); 
+        Object.keys(state.textCounts).forEach(k=>state.textCounts[k]=0); 
+        Object.keys(state.colors).forEach(k=>state.colors[k]=0);
         render();
     }
 
     function render() {
+        document.getElementById('custom-options').style.display = state.mode === 'custom' ? 'block' : 'none';
+        document.getElementById('solid-options').style.display = state.mode === 'solid' ? 'block' : 'none';
         document.querySelectorAll('#model-grid .btn-select').forEach(b => b.classList.toggle('active', b.innerText === state.model));
         document.getElementById('mode-custom').classList.toggle('active', state.mode === 'custom');
         document.getElementById('mode-solid').classList.toggle('active', state.mode === 'solid');
-        document.getElementById('custom-options').style.display = state.mode === 'custom' ? 'block' : 'none';
-        document.getElementById('tax-btn').classList.toggle('active', state.taxOn);
-        
+        const isSmall = ["ストーン", "グリフォン", "ベッカー", "ビリー"].includes(state.model);
+        const pearlAdd = isSmall ? 2000 : 4000;
+        document.getElementById('pearl-price-label').innerText = `+¥${pearlAdd.toLocaleString()}`;
+        document.getElementById('btn-s-black').classList.toggle('active', state.solidColor === 'ブラック');
+        document.getElementById('btn-s-white').classList.toggle('active', state.solidColor === 'ホワイト');
+        document.getElementById('btn-s-ivory').classList.toggle('active', state.solidColor === 'アイボリー');
+        document.getElementById('btn-s-pearl').classList.toggle('active', state.solidColor === 'パール');
         document.getElementById('side-sync-yes').classList.toggle('active', state.sideSync);
         document.getElementById('side-sync-no').classList.toggle('active', !state.sideSync);
         document.getElementById('side-same-area').style.display = state.sideSync ? 'block' : 'none';
         document.getElementById('side-diff-area').style.display = state.sideSync ? 'none' : 'block';
-
-        ['same','l','r'].forEach(p => {
-            ['none','normal','special'].forEach(t => {
-                const el = document.getElementById(`side-${p}-${t}`);
-                if(el) el.classList.toggle('active', state[`side${p.charAt(0).toUpperCase() + p.slice(1)}`] === t);
-            });
+        ['none','normal','special'].forEach(t => {
+            if(document.getElementById(`side-same-${t}`)) document.getElementById(`side-same-${t}`).classList.toggle('active', state.sideSame === t);
+            if(document.getElementById(`side-l-${t}`)) document.getElementById(`side-l-${t}`).classList.toggle('active', state.sideL === t);
+            if(document.getElementById(`side-r-${t}`)) document.getElementById(`side-r-${t}`).classList.toggle('active', state.sideR === t);
+            document.getElementById(`back-${t}`).classList.toggle('active', state.back === t);
         });
-        ['none','normal','special'].forEach(t => document.getElementById(`back-${t}`).classList.toggle('active', state.back === t));
-        Object.keys(state.colors).forEach(k => document.getElementById(`btn-${k}`).classList.toggle('active', state.colors[k] === 1));
-        Object.keys(state.textCounts).forEach(k => document.getElementById(`val-${k}`).innerText = state.textCounts[k]);
+        Object.keys(state.colors).forEach(k => {
+            const el = document.getElementById(`btn-${k}`);
+            if(el) el.classList.toggle('active', state.colors[k] === 1);
+        });
+        textOptions.forEach(o => {
+            const badge = document.getElementById(`badge-${o.k}`);
+            badge.innerText = state.textCounts[o.k];
+            badge.style.display = state.textCounts[o.k] > 0 ? 'block' : 'none';
+            document.getElementById(`btn-text-${o.k}`).classList.toggle('has-count', state.textCounts[o.k] > 0);
+        });
         document.getElementById('adj-plus').classList.toggle('active', state.adjType === 1);
         document.getElementById('adj-minus').classList.toggle('active', state.adjType === -1);
+        document.getElementById('tax-btn').classList.toggle('active', state.taxOn);
 
-        let total = (state.mode === 'solid' ? solidPrices[state.model] : basePrices[state.model]);
-        if(state.mode === 'custom') {
-            total += state.colors.pearl*2000 + state.colors.candy*2000 + state.colors.flake*4000 + state.colors.wrap*4000;
-            if(state.sideSync) total += designPrices[state.sideSame];
-            else total += designPrices[state.sideL] + designPrices[state.sideR];
+        let total = 0;
+        let summary = [state.model];
+        if(state.mode === 'solid') {
+            summary.push('単色', state.solidColor);
+            total = solidPrices[state.model];
+            if(state.solidColor === 'パール') total += pearlAdd;
+        } else {
+            summary.push('カスタム');
+            total = basePrices[state.model];
+            const c = state.colors;
+            if(c.black) summary.push('ブラック'); if(c.gunmetal) summary.push('ガンメタ'); if(c.silver) summary.push('シルバー');
+            if(c.pearl) { summary.push('パール'); total += 2000; }
+            if(c.candy) { summary.push('キャンディ'); total += 2000; }
+            if(c.flake) { summary.push('フレーク'); total += 4000; }
+            if(c.wrap) { summary.push('ラップ'); total += 4000; }
+            total += state.sideSync ? designPrices[state.sideSame] : (designPrices[state.sideL] + designPrices[state.sideR]);
             total += designPrices[state.back];
             textOptions.forEach(o => total += state.textCounts[o.k] * o.p);
             total += (state.adjType * state.adjValue);
         }
+        document.getElementById('selected-summary').innerText = summary.join(' / ');
         if(state.taxOn) total *= 1.1;
-        document.getElementById('total-price').innerText = `¥${Math.floor(total).toLocaleString()}`;
+        document.getElementById('total-price').innerText = `¥${Math.max(0, Math.floor(total)).toLocaleString()}`;
     }
     init();
 </script>
