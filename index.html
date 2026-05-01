@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Third-Eye 塗装電卓 v2.1</title>
+    <title>Third-Eye 塗装電卓 v2.2</title>
     <style>
         :root {
             --win-bg: #eef1f5;
@@ -39,6 +39,8 @@
         /* メイン */
         .main-content { position: absolute; top: 190px; bottom: 0; left: 0; width: 100%; overflow-y: auto; padding: 10px 12px 160px; scroll-behavior: smooth; }
         h2 { font-size: 16px; font-weight: 800; margin: 30px 0 12px 2px; color: #333; border-left: 5px solid var(--win-btn-active); padding-left: 10px; }
+        h2 small { font-weight: 400; font-size: 11px; color: #777; margin-left: 5px; border: none; }
+
         .grid-4, .grid-3, .grid-2 { display: grid; gap: 6px; }
         .grid-4 { grid-template-columns: repeat(4, 1fr); }
         .grid-3 { grid-template-columns: repeat(3, 1fr); }
@@ -52,7 +54,7 @@
         .btn-select.active { background-color: var(--win-btn-active); color: #fff; border: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
         .btn-select span { font-size: 11px; margin-top: 3px; opacity: 0.9; font-weight: normal; }
 
-        /* アイコンボタン（画像確認用） */
+        /* アイコンボタン */
         .i-icon {
             position: absolute; top: 4px; right: 4px; width: 22px; height: 22px;
             background: rgba(0,0,0,0.08); border-radius: 50%; font-size: 12px;
@@ -68,15 +70,18 @@
         .sub-group { background: #e0e6ed; padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid rgba(0,0,0,0.05); }
         .sub-label { font-size: 12px; font-weight: 800; color: #5a6c7d; margin-bottom: 8px; display: block; }
 
-        /* 数値入力 */
-        .adj-box { display: flex; flex-direction: column; gap: 8px; }
-        .adj-top-row, .adj-bottom-row { display: flex; gap: 8px; }
+        /* 数値入力セクション修正 */
+        .adj-box { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+        .adj-top-row { display: flex; gap: 8px; width: 100%; }
+        .adj-row { display: flex; gap: 8px; width: 100%; } /* 横並び用 */
+        
         .adj-type-btn { flex: 1; height: 48px; border: 1px solid var(--win-border); background: #fff; border-radius: 8px; font-weight: 800; cursor: pointer; }
         .adj-type-btn.active { background-color: #2c3e50; color: #fff; border-color: #2c3e50; }
-        .adj-input { flex: 1; height: 58px; border: 2px solid var(--win-border); border-radius: 8px; text-align: center; font-size: 24px; font-weight: 800; background: #fff; color: var(--win-btn-active); }
-        .adj-zero-btn { width: 70px; height: 58px; border: 1px solid var(--win-border); background: #d1d9e6; border-radius: 8px; font-weight: 800; color: #333; }
+        
+        .adj-input { flex: 1; height: 58px; border: 2px solid var(--win-border); border-radius: 8px; text-align: center; font-size: 24px; font-weight: 800; background: #fff; color: var(--win-btn-active); min-width: 0; } /* min-width:0で崩れ防止 */
+        .adj-zero-btn { width: 80px; height: 58px; border: 1px solid var(--win-border); background: #d1d9e6; border-radius: 8px; font-weight: 800; color: #333; flex-shrink: 0; }
 
-        /* 画像モーダル（ギャラリー） */
+        /* モーダル */
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
         .modal-content { position: relative; max-width: 90%; text-align: center; }
         .modal-img { width: 100%; max-height: 70vh; border-radius: 8px; border: 3px solid #fff; object-fit: contain; }
@@ -88,7 +93,6 @@
 </head>
 <body>
 
-<!-- 画像表示用モーダル -->
 <div id="imageModal" class="modal" onclick="closeModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
         <span class="modal-close" onclick="closeModal()">×</span>
@@ -102,7 +106,7 @@
 </div>
 
 <div class="header-panel">
-    <div class="win-title">Third-Eye 塗装電卓 v2.1</div>
+    <div class="win-title">Third-Eye 塗装電卓 v2.2</div>
     <div class="price-display-container">
         <div id="selected-summary" class="selected-summary"></div>
         <div id="tax-label" class="tax-label">合計 (税込)</div>
@@ -128,7 +132,7 @@
         </div>
     </section>
 
-    <!-- 単色用パネル -->
+    <!-- 単色パネル -->
     <div id="solid-options" style="display:none;">
         <section>
             <h2>3. 単色カラー</h2>
@@ -141,7 +145,7 @@
         </section>
     </div>
 
-    <!-- カスタム用パネル -->
+    <!-- カスタムパネル -->
     <div id="custom-options">
         <section>
             <h2>3. カスタム色</h2>
@@ -165,7 +169,7 @@
         </section>
 
         <section>
-            <h2>4. デザイン選択</h2>
+            <h2>4. デザイン選択 <small>(iで写真表示)</small></h2>
             <div class="sub-group">
                 <span class="sub-label">左右の構成</span>
                 <div class="grid-2">
@@ -202,7 +206,7 @@
         </section>
 
         <section>
-            <h2>5. 文字入れ</h2>
+            <h2>5. 文字入れ <small>(タップで増加 / 長押し・右クリックで0)</small></h2>
             <div class="grid-2" id="text-grid"></div>
         </section>
 
@@ -223,30 +227,20 @@
 </div>
 
 <script>
+    // --- ロジック部分は変更なし ---
     const basePrices = { "ストーン": 20000, "グリフォン": 20000, "ベッカー": 22000, "ビリー": 22000, "TFS": 29000, "ジョーカーF": 44000, "ジョーカーXL": 47000 };
     const solidPrices = { "ストーン": 15000, "グリフォン": 15000, "ベッカー": 17000, "ビリー": 17000, "TFS": 22000, "ジョーカーF": 36000, "ジョーカーXL": 39000 };
-    const textOptions = [ {n:"社内定型ぼかし", k:"n1", p:2000}, {n:"社内定型はっきり", k:"n2", p:3000}, {n:"社内オリぼかし", k:"n3", p:3000}, {n:"社内オリはっきり", k:"n4", p:4000}, {n:"社外フォント", k:"n5", p:5000}, {n:"オリジナルロゴ", k:"n6", p:8000} ];
+    const textOptions = [ {n:"FTW / HD ぼかし", k:"n1", p:2000}, {n:"FTW / HD はっきり", k:"n2", p:3000}, {n:"社内フォント<br>オリジナル文字 ぼかし", k:"n3", p:3000}, {n:"社内フォント<br>オリジナル文字 はっきり", k:"n4", p:4000}, {n:"社外フォント", k:"n5", p:5000}, {n:"オリジナルロゴ", k:"n6", p:8000} ];
     const designPrices = { "none": 0, "normal": 2000, "special": 4000 };
 
-    // ギャラリーデータ
     const galleryData = {
-        side: [
-            {url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/U0lERV8wMQ.jpg", n: "ウイング1"},
-            {url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/U0lERV8wMg.jpg", n: "ウイング2"},
-            {url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/U0lERV8wNw.jpg", n: "リーフ3"}
-        ],
-        back: [
-            {url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18wOQ.jpg", n: "スカルズ"},
-            {url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18xMQ.jpg", n: "ウイングスカル"},
-            {url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18xNg.jpg", n: "ローズ1"},
-            {url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18xOQ.jpg", n: "エンブレム1"}
-        ]
+        side: [{url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/U0lERV8wMQ.jpg", n: "ウイング1"},{url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/U0lERV8wMg.jpg", n: "ウイング2"},{url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/U0lERV8wNw.jpg", n: "リーフ3"}],
+        back: [{url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18wOQ.jpg", n: "スカルズ"},{url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18xMQ.jpg", n: "ウイングスカル"},{url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18xNg.jpg", n: "ローズ1"},{url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18xOQ.jpg", n: "エンブレム1"}]
     };
 
     let state = {
         model: "ストーン", mode: "custom", taxOn: true,
-        solidColor: "ブラック",
-        sideSync: true, sideSame: "none", sideL: "none", sideR: "none", back: "none",
+        solidColor: "ブラック", sideSync: true, sideSame: "none", sideL: "none", sideR: "none", back: "none",
         adjType: 1, adjValue: 0,
         textCounts: { n1:0, n2:0, n3:0, n4:0, n5:0, n6:0 },
         colors: { black:0, gunmetal:0, silver:0, pearl:0, candy:0, flake:0, wrap:0 }
@@ -256,17 +250,14 @@
         const mGrid = document.getElementById('model-grid');
         Object.keys(basePrices).forEach(m => {
             const btn = document.createElement('div');
-            btn.className = 'btn-select';
-            btn.innerText = m;
+            btn.className = 'btn-select'; btn.innerText = m;
             btn.onclick = () => { state.model = m; render(); };
             mGrid.appendChild(btn);
         });
-
         const tGrid = document.getElementById('text-grid');
         textOptions.forEach(o => {
             const btn = document.createElement('div');
-            btn.className = 'btn-select';
-            btn.id = `btn-text-${o.k}`;
+            btn.className = 'btn-select'; btn.id = `btn-text-${o.k}`;
             btn.innerHTML = `${o.n}<span>+¥${o.p.toLocaleString()}</span><div class="text-count-badge" id="badge-${o.k}">0</div>`;
             btn.onclick = () => { state.textCounts[o.k]++; render(); };
             btn.oncontextmenu = (e) => { e.preventDefault(); state.textCounts[o.k] = 0; render(); };
@@ -275,29 +266,14 @@
         render();
     }
 
-    // ギャラリー用関数
-    let currentGallery = [];
-    let curIdx = 0;
-    function openGallery(key) {
-        currentGallery = galleryData[key];
-        curIdx = 0;
-        document.getElementById('imageModal').style.display = 'flex';
-        updateModal();
-    }
+    let currentGallery = []; let curIdx = 0;
+    function openGallery(key) { currentGallery = galleryData[key]; curIdx = 0; document.getElementById('imageModal').style.display = 'flex'; updateModal(); }
     function closeModal() { document.getElementById('imageModal').style.display = 'none'; }
-    function changeImg(d) {
-        curIdx = (curIdx + d + currentGallery.length) % currentGallery.length;
-        updateModal();
-    }
-    function updateModal() {
-        document.getElementById('modalImg').src = currentGallery[curIdx].url;
-        document.getElementById('modalCaption').innerText = currentGallery[curIdx].n;
-    }
-
+    function changeImg(d) { curIdx = (curIdx + d + currentGallery.length) % currentGallery.length; updateModal(); }
+    function updateModal() { document.getElementById('modalImg').src = currentGallery[curIdx].url; document.getElementById('modalCaption').innerText = currentGallery[curIdx].n; }
     function setSolidColor(color) { state.solidColor = color; render(); }
     function toggleColor(key) {
-        const basics = ['black', 'gunmetal', 'silver'];
-        const options = ['pearl', 'candy', 'flake', 'wrap'];
+        const basics = ['black', 'gunmetal', 'silver']; const options = ['pearl', 'candy', 'flake', 'wrap'];
         if (state.colors[key] === 1) state.colors[key] = 0;
         else {
             if (basics.includes(key)) { basics.forEach(k => state.colors[k] = 0); options.forEach(k => state.colors[k] = 0); }
@@ -310,25 +286,19 @@
         }
         render();
     }
-
     function setSideSync(sync) { state.sideSync = sync; render(); }
-    function setSideDesign(pos, type) {
-        if(pos === 'same') state.sideSame = type; else if(pos === 'l') state.sideL = type; else if(pos === 'r') state.sideR = type;
-        render();
-    }
+    function setSideDesign(pos, type) { if(pos === 'same') state.sideSame = type; else if(pos === 'l') state.sideL = type; else if(pos === 'r') state.sideR = type; render(); }
     function setBackDesign(type) { state.back = type; render(); }
     function setMode(m) { state.mode = m; render(); }
     function toggleTax() { state.taxOn = !state.taxOn; render(); }
     function setAdjType(t) { state.adjType = t; render(); }
     function updateAdjValue() { state.adjValue = Number(document.getElementById('adj-input').value) || 0; render(); }
     function clearAdj() { document.getElementById('adj-input').value = ""; state.adjValue = 0; render(); }
-
     function resetAll() {
         state.model="ストーン"; state.mode="custom"; state.solidColor="ブラック";
         state.sideSync=true; state.sideSame="none"; state.sideL="none"; state.sideR="none"; state.back="none";
         state.adjType=1; clearAdj(); 
-        Object.keys(state.textCounts).forEach(k=>state.textCounts[k]=0); 
-        Object.keys(state.colors).forEach(k=>state.colors[k]=0);
+        Object.keys(state.textCounts).forEach(k=>state.textCounts[k]=0); Object.keys(state.colors).forEach(k=>state.colors[k]=0);
         render();
     }
 
@@ -338,53 +308,42 @@
         document.querySelectorAll('#model-grid .btn-select').forEach(b => b.classList.toggle('active', b.innerText === state.model));
         document.getElementById('mode-custom').classList.toggle('active', state.mode === 'custom');
         document.getElementById('mode-solid').classList.toggle('active', state.mode === 'solid');
-        
         const isSmall = ["ストーン", "グリフォン", "ベッカー", "ビリー"].includes(state.model);
         const pearlAdd = isSmall ? 2000 : 4000;
         document.getElementById('pearl-price-label').innerText = `+¥${pearlAdd.toLocaleString()}`;
-        
         document.getElementById('btn-s-black').classList.toggle('active', state.solidColor === 'ブラック');
         document.getElementById('btn-s-white').classList.toggle('active', state.solidColor === 'ホワイト');
         document.getElementById('btn-s-ivory').classList.toggle('active', state.solidColor === 'アイボリー');
         document.getElementById('btn-s-pearl').classList.toggle('active', state.solidColor === 'パール');
-        
         document.getElementById('side-sync-yes').classList.toggle('active', state.sideSync);
         document.getElementById('side-sync-no').classList.toggle('active', !state.sideSync);
         document.getElementById('side-same-area').style.display = state.sideSync ? 'block' : 'none';
         document.getElementById('side-diff-area').style.display = state.sideSync ? 'none' : 'block';
-
         ['none','normal','special'].forEach(t => {
             if(document.getElementById(`side-same-${t}`)) document.getElementById(`side-same-${t}`).classList.toggle('active', state.sideSame === t);
             if(document.getElementById(`side-l-${t}`)) document.getElementById(`side-l-${t}`).classList.toggle('active', state.sideL === t);
             if(document.getElementById(`side-r-${t}`)) document.getElementById(`side-r-${t}`).classList.toggle('active', state.sideR === t);
             document.getElementById(`back-${t}`).classList.toggle('active', state.back === t);
         });
-
         Object.keys(state.colors).forEach(k => {
             const el = document.getElementById(`btn-${k}`);
             if(el) el.classList.toggle('active', state.colors[k] === 1);
         });
-
         textOptions.forEach(o => {
             const badge = document.getElementById(`badge-${o.k}`);
             badge.innerText = state.textCounts[o.k];
             badge.style.display = state.textCounts[o.k] > 0 ? 'block' : 'none';
             document.getElementById(`btn-text-${o.k}`).classList.toggle('has-count', state.textCounts[o.k] > 0);
         });
-
         document.getElementById('adj-plus').classList.toggle('active', state.adjType === 1);
         document.getElementById('adj-minus').classList.toggle('active', state.adjType === -1);
         document.getElementById('tax-btn').classList.toggle('active', state.taxOn);
-
-        let total = 0;
-        let summary = [state.model];
+        let total = 0; let summary = [state.model];
         if(state.mode === 'solid') {
-            summary.push('単色', state.solidColor);
-            total = solidPrices[state.model];
+            summary.push('単色', state.solidColor); total = solidPrices[state.model];
             if(state.solidColor === 'パール') total += pearlAdd;
         } else {
-            summary.push('カスタム');
-            total = basePrices[state.model];
+            summary.push('カスタム'); total = basePrices[state.model];
             const c = state.colors;
             if(c.black) summary.push('黒'); if(c.gunmetal) summary.push('GM'); if(c.silver) summary.push('銀');
             if(c.pearl) { summary.push('パール'); total += 2000; }
