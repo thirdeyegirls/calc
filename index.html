@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Third-Eye 塗装電卓 v2.2</title>
+    <title>Third-Eye 塗装電卓 v26.5 @Guu</title>
     <style>
         :root {
             --win-bg: #eef1f5;
@@ -27,7 +27,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         .win-title { font-size: 11px; color: #888; letter-spacing: 1px; margin-bottom: 5px; font-weight: bold; }
-        .selected-summary { font-size: 13px; color: var(--win-btn-active); text-align: right; width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-bottom: 2px; font-weight: 800; }
+        .selected-summary { font-size: 12px; color: var(--win-btn-active); text-align: right; width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-bottom: 2px; font-weight: 800; min-height: 1.2em; }
         .price-display-container { flex: 1; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; }
         .tax-label { font-size: 13px; color: #666; font-weight: bold; margin-bottom: -5px; }
         .price-display { font-size: 52px; font-weight: 900; line-height: 1; color: #000; letter-spacing: -1px; }
@@ -46,13 +46,20 @@
         .grid-3 { grid-template-columns: repeat(3, 1fr); }
         .grid-2 { grid-template-columns: repeat(2, 1fr); }
 
-        /* ボタン */
+        /* ボタン共通設定 */
         .btn-select {
-            background-color: var(--win-btn-bg); border: 1px solid var(--win-border); border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;
-            min-height: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; box-shadow: var(--win-shadow);
+            background-color: var(--win-btn-bg); border: 1px solid var(--win-border); border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;
+            height: 72px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; box-shadow: var(--win-shadow);
+            text-align: center; padding: 4px; line-height: 1.2;
         }
-        .btn-select.active { background-color: var(--win-btn-active); color: #fff; border: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
-        .btn-select span { font-size: 11px; margin-top: 3px; opacity: 0.9; font-weight: normal; }
+        .btn-select.active { background-color: var(--win-btn-active); color: #fff !important; border: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+        .btn-select span { font-size: 10px; margin-top: 3px; opacity: 0.9; font-weight: normal; color: inherit; }
+
+        /* デザイン注釈 */
+        .design-note { margin-top: 15px; background: #fff; border-radius: 8px; padding: 12px; border: 1px solid var(--win-border); box-shadow: var(--win-shadow); }
+        .note-title { font-size: 12px; font-weight: 800; color: var(--win-btn-active); margin-bottom: 5px; display: block; border-bottom: 1px solid #eee; padding-bottom: 3px; }
+        .note-body { font-size: 11px; line-height: 1.6; color: #555; }
+        .note-body b { color: #333; }
 
         /* アイコンボタン */
         .i-icon {
@@ -62,24 +69,16 @@
         }
         .active .i-icon { background: rgba(255,255,255,0.2); color: #fff; }
 
-        /* バッジ */
-        .text-count-badge { position: absolute; top: -6px; right: -6px; background: #000; color: #fff; border: 2px solid #fff; font-size: 11px; min-width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-        .btn-select.has-count { border: 2.5px solid var(--win-btn-active); color: var(--win-btn-active); background: #fff; }
-
         /* サブグループ */
         .sub-group { background: #e0e6ed; padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid rgba(0,0,0,0.05); }
         .sub-label { font-size: 12px; font-weight: 800; color: #5a6c7d; margin-bottom: 8px; display: block; }
 
-        /* 数値入力セクション修正 */
-        .adj-box { display: flex; flex-direction: column; gap: 8px; width: 100%; }
-        .adj-top-row { display: flex; gap: 8px; width: 100%; }
-        .adj-row { display: flex; gap: 8px; width: 100%; } /* 横並び用 */
-        
-        .adj-type-btn { flex: 1; height: 48px; border: 1px solid var(--win-border); background: #fff; border-radius: 8px; font-weight: 800; cursor: pointer; }
-        .adj-type-btn.active { background-color: #2c3e50; color: #fff; border-color: #2c3e50; }
-        
-        .adj-input { flex: 1; height: 58px; border: 2px solid var(--win-border); border-radius: 8px; text-align: center; font-size: 24px; font-weight: 800; background: #fff; color: var(--win-btn-active); min-width: 0; } /* min-width:0で崩れ防止 */
-        .adj-zero-btn { width: 80px; height: 58px; border: 1px solid var(--win-border); background: #d1d9e6; border-radius: 8px; font-weight: 800; color: #333; flex-shrink: 0; }
+        /* 最終調整セクション */
+        .adj-row-single { display: flex; gap: 6px; align-items: center; width: 100%; height: 58px; }
+        .adj-symbol-btn { width: 50px; height: 100%; border: 1px solid var(--win-border); background: #fff; border-radius: 8px; font-weight: 900; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: var(--win-shadow); }
+        .adj-symbol-btn.active { background-color: #2c3e50; color: #fff; border-color: #2c3e50; }
+        .adj-input-single { flex: 1; height: 100%; border: 2px solid var(--win-border); border-radius: 8px; text-align: center; font-size: 22px; font-weight: 800; background: #fff; color: var(--win-btn-active); min-width: 0; }
+        .adj-clear-btn { width: 70px; height: 100%; border: 1px solid var(--win-border); background: #d1d9e6; border-radius: 8px; font-weight: 800; font-size: 13px; color: #333; flex-shrink: 0; cursor: pointer; }
 
         /* モーダル */
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
@@ -106,7 +105,7 @@
 </div>
 
 <div class="header-panel">
-    <div class="win-title">Third-Eye 塗装電卓 v2.2</div>
+    <div class="win-title">Third-Eye 塗装電卓 v26.5 @Guu</div>
     <div class="price-display-container">
         <div id="selected-summary" class="selected-summary"></div>
         <div id="tax-label" class="tax-label">合計 (税込)</div>
@@ -132,7 +131,6 @@
         </div>
     </section>
 
-    <!-- 単色パネル -->
     <div id="solid-options" style="display:none;">
         <section>
             <h2>3. 単色カラー</h2>
@@ -145,7 +143,6 @@
         </section>
     </div>
 
-    <!-- カスタムパネル -->
     <div id="custom-options">
         <section>
             <h2>3. カスタム色</h2>
@@ -161,7 +158,7 @@
                 <span class="sub-label">オプションベース</span>
                 <div class="grid-2">
                     <div id="btn-pearl" class="btn-select" onclick="toggleColor('pearl')">パールホワイト<span>+¥2,000</span></div>
-                    <div id="btn-candy" class="btn-select" onclick="toggleColor('candy')">キャンディ<span>+¥2,000</span></div>
+                    <div id="btn-candy" class="btn-select" onclick="toggleColor('candy')">キャンディ・ネオン<span>+¥2,000</span></div>
                     <div id="btn-flake" class="btn-select" onclick="toggleColor('flake')">フレーク<span>+¥4,000</span></div>
                     <div id="btn-wrap" class="btn-select" onclick="toggleColor('wrap')">ラップ<span>+¥4,000</span></div>
                 </div>
@@ -203,39 +200,55 @@
                     </div>
                 </div>
             </div>
+
+            <!-- デザイン注釈エリア -->
+            <div class="design-note">
+                <span class="note-title">[特定] デザイン一覧</span>
+                <div class="note-body">
+                    <b>サイド：</b>ウイング1 ・ ウイング2 ・ リーフ3<br>
+                    <b>バック：</b>スカルズ ・ ウイングスカル ・ ローズ1 ・ エンブレムクロス1 ・ エンブレムクロス2 ・ ウイングクロス
+                </div>
+            </div>
         </section>
 
         <section>
-            <h2>5. 文字入れ <small>(タップで増加 / 長押し・右クリックで0)</small></h2>
+            <h2>5. 文字入れ <small>(複数選択可 / タップでON・OFF)</small></h2>
             <div class="grid-2" id="text-grid"></div>
         </section>
 
         <section>
             <h2>6. 最終調整</h2>
-            <div class="adj-box">
-                <div class="adj-top-row">
-                    <button id="adj-plus" class="adj-type-btn" onclick="setAdjType(1)">＋ 加算</button>
-                    <button id="adj-minus" class="adj-type-btn" onclick="setAdjType(-1)">－ 減算</button>
-                </div>
-                <div class="adj-row">
-                    <input type="number" id="adj-input" class="adj-input" placeholder="0" oninput="updateAdjValue()" inputmode="numeric">
-                    <button class="adj-zero-btn" onclick="clearAdj()">クリア</button>
-                </div>
+            <div class="adj-row-single">
+                <button id="adj-plus" class="adj-symbol-btn" onclick="setAdjType(1)">＋</button>
+                <button id="adj-minus" class="adj-symbol-btn" onclick="setAdjType(-1)">－</button>
+                <input type="number" id="adj-input" class="adj-input-single" placeholder="0" oninput="updateAdjValue()" inputmode="numeric">
+                <button class="adj-clear-btn" onclick="clearAdj()">クリア</button>
             </div>
         </section>
     </div>
 </div>
 
 <script>
-    // --- ロジック部分は変更なし ---
     const basePrices = { "ストーン": 20000, "グリフォン": 20000, "ベッカー": 22000, "ビリー": 22000, "TFS": 29000, "ジョーカーF": 44000, "ジョーカーXL": 47000 };
     const solidPrices = { "ストーン": 15000, "グリフォン": 15000, "ベッカー": 17000, "ビリー": 17000, "TFS": 22000, "ジョーカーF": 36000, "ジョーカーXL": 39000 };
-    const textOptions = [ {n:"FTW / HD ぼかし", k:"n1", p:2000}, {n:"FTW / HD はっきり", k:"n2", p:3000}, {n:"社内フォント<br>オリジナル文字 ぼかし", k:"n3", p:3000}, {n:"社内フォント<br>オリジナル文字 はっきり", k:"n4", p:4000}, {n:"社外フォント", k:"n5", p:5000}, {n:"オリジナルロゴ", k:"n6", p:8000} ];
+    const textOptions = [ {n:"FTW・HD ぼかし", k:"n1", p:2000}, {n:"FTW・HD はっきり", k:"n2", p:3000}, {n:"社内フォント オリジナル文 ぼかし", k:"n3", p:3000}, {n:"社内フォント オリジナル文 はっきり", k:"n4", p:4000}, {n:"社外フォント", k:"n5", p:5000}, {n:"オリジナルロゴ", k:"n6", p:8000} ];
     const designPrices = { "none": 0, "normal": 2000, "special": 4000 };
+    const designLabels = { "none": "なし", "normal": "普通", "special": "特定" };
 
     const galleryData = {
-        side: [{url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/U0lERV8wMQ.jpg", n: "ウイング1"},{url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/U0lERV8wMg.jpg", n: "ウイング2"},{url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/U0lERV8wNw.jpg", n: "リーフ3"}],
-        back: [{url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18wOQ.jpg", n: "スカルズ"},{url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18xMQ.jpg", n: "ウイングスカル"},{url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18xNg.jpg", n: "ローズ1"},{url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18xOQ.jpg", n: "エンブレム1"}]
+        side: [
+            {url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/U0lERV8wMQ.jpg?cmsp_timestamp=20260406104834", n: "ウイング1"},
+            {url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/U0lERV8wMg.jpg?cmsp_timestamp=20250331142308", n: "ウイング2"},
+            {url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/U0lERV8wNw.jpg?cmsp_timestamp=20250331142541", n: "リーフ3"}
+        ],
+        back: [
+            {url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18wOQ.jpg?cmsp_timestamp=20250331162627", n: "スカルズ"},
+            {url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18xMQ.jpg?cmsp_timestamp=20250331162627", n: "ウイングスカル"},
+            {url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18xNg.jpg?cmsp_timestamp=20250331163017", n: "ローズ1"},
+            {url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18xOQ.jpg?cmsp_timestamp=20250331163123", n: "エンブレムクロス1"},
+            {url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18yMA.jpg?cmsp_timestamp=20250331163123", n: "エンブレムクロス2"},
+            {url: "https://img07.shop-pro.jp/PA01445/472/etc_base64/QkFDS18yMQ.jpg?cmsp_timestamp=20250331163123", n: "ウイングクロス"}
+        ]
     };
 
     let state = {
@@ -258,9 +271,11 @@
         textOptions.forEach(o => {
             const btn = document.createElement('div');
             btn.className = 'btn-select'; btn.id = `btn-text-${o.k}`;
-            btn.innerHTML = `${o.n}<span>+¥${o.p.toLocaleString()}</span><div class="text-count-badge" id="badge-${o.k}">0</div>`;
-            btn.onclick = () => { state.textCounts[o.k]++; render(); };
-            btn.oncontextmenu = (e) => { e.preventDefault(); state.textCounts[o.k] = 0; render(); };
+            btn.innerHTML = `${o.n}<span>+¥${o.p.toLocaleString()}</span>`;
+            btn.onclick = () => { 
+                state.textCounts[o.k] = (state.textCounts[o.k] > 0) ? 0 : 1; 
+                render(); 
+            };
             tGrid.appendChild(btn);
         });
         render();
@@ -330,14 +345,13 @@
             if(el) el.classList.toggle('active', state.colors[k] === 1);
         });
         textOptions.forEach(o => {
-            const badge = document.getElementById(`badge-${o.k}`);
-            badge.innerText = state.textCounts[o.k];
-            badge.style.display = state.textCounts[o.k] > 0 ? 'block' : 'none';
-            document.getElementById(`btn-text-${o.k}`).classList.toggle('has-count', state.textCounts[o.k] > 0);
+            const el = document.getElementById(`btn-text-${o.k}`);
+            el.classList.toggle('active', state.textCounts[o.k] > 0);
         });
         document.getElementById('adj-plus').classList.toggle('active', state.adjType === 1);
         document.getElementById('adj-minus').classList.toggle('active', state.adjType === -1);
         document.getElementById('tax-btn').classList.toggle('active', state.taxOn);
+
         let total = 0; let summary = [state.model];
         if(state.mode === 'solid') {
             summary.push('単色', state.solidColor); total = solidPrices[state.model];
@@ -345,14 +359,33 @@
         } else {
             summary.push('カスタム'); total = basePrices[state.model];
             const c = state.colors;
-            if(c.black) summary.push('黒'); if(c.gunmetal) summary.push('GM'); if(c.silver) summary.push('銀');
-            if(c.pearl) { summary.push('パール'); total += 2000; }
+            if(c.black) summary.push('ブラック'); if(c.gunmetal) summary.push('ガンメタ'); if(c.silver) summary.push('シルバー');
+            if(c.pearl) { summary.push('パールホワイト'); total += 2000; }
             if(c.candy) { summary.push('キャンディ'); total += 2000; }
             if(c.flake) { summary.push('フレーク'); total += 4000; }
             if(c.wrap) { summary.push('ラップ'); total += 4000; }
-            total += state.sideSync ? designPrices[state.sideSame] : (designPrices[state.sideL] + designPrices[state.sideR]);
+            
+            // デザインサマリー追加
+            if(state.sideSync) {
+                if(state.sideSame !== 'none') summary.push(`サイド:${designLabels[state.sideSame]}`);
+                total += designPrices[state.sideSame];
+            } else {
+                if(state.sideL !== 'none') summary.push(`L:${designLabels[state.sideL]}`);
+                if(state.sideR !== 'none') summary.push(`R:${designLabels[state.sideR]}`);
+                total += designPrices[state.sideL] + designPrices[state.sideR];
+            }
+            if(state.back !== 'none') summary.push(`バック:${designLabels[state.back]}`);
             total += designPrices[state.back];
-            textOptions.forEach(o => total += state.textCounts[o.k] * o.p);
+
+            // 文字入れサマリー追加
+            textOptions.forEach(o => {
+                if(state.textCounts[o.k] > 0) {
+                    // 名称を短縮して表示（レイアウト維持のため）
+                    let shortName = o.n.replace('<br>', ' ').replace('社内フォント ', '').replace('文字入れ ', '');
+                    summary.push(shortName);
+                    total += o.p;
+                }
+            });
             total += (state.adjType * state.adjValue);
         }
         document.getElementById('selected-summary').innerText = summary.join(' / ');
